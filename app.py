@@ -1,21 +1,15 @@
-from flask import Flask, abort, request
+from __future__ import unicode_literals
+import os
+from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import (MessageEvent,
-                            TextMessage,
-                            TextSendMessage,
-                            ImageSendMessage,
-                            VideoSendMessage,
-                            AudioSendMessage,
-                            LocationSendMessage,
-                            StickerSendMessage,
-                            ImagemapSendMessage,
-                            TemplateSendMessage,
-                            ButtonsTemplate,
-                            MessageTemplateAction,
-                            PostbackEvent,
-                            PostbackTemplateAction)
-import os
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
+
+import configparser
+
+import urllib
+import re
+import random
 
 app = Flask(__name__)
 
@@ -23,60 +17,59 @@ line_bot_api = LineBotApi("S1NRUscHr3pXdpnYh28UZlZmeEnmEbfX6rkSC3WHo/zSbBxUJcKgL
 handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
-@app.route("/", methods=["GET", "POST"])
+# 接收 LINE 的資訊
+@app.route("/", methods=['POST'])
 def callback():
+    signature = request.headers['X-Line-Signature']
 
-    if request.method == "GET":
-        return "Hello Heroku"
-    if request.method == "POST":
-        signature = request.headers["X-Line-Signature"]
-        body = request.get_data(as_text=True)
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
 
-        try:
-            handler.handle(body, signature)
-        except InvalidSignatureError:
-            abort(400)
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
 
-        return "OK"
+    return 'OK'
 
-
+# 請 pixabay 幫我們找圖
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    get_message = event.message.text
-
-    def text_reply(content):
-        reply = TextSendMessage(text=content)
-        line_bot_api.reply_message(event.reply_token, reply)
-
-    if isinstance(event, MessageEvent):
-        if get_message == 'test':
-            line_bot_api.reply_message(  # 回復傳入的訊息文字
+    
+    if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
+        try:
+            url = f"https://pixabay.com/images/search/{urllib.parse.urlencode({'q':event.message.text})[2:]}/"
+            headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36'}
+            
+            req = urllib.request.Request(url, headers = headers)
+            conn = urllib.request.urlopen(req)
+            
+            print('fetch page finish')
+            
+            pattern = 'img srcset="\S*\s\w*,'
+            img_list = []
+            
+            for match in re.finditer(pattern, str(conn.read())):
+                img_list.append(match.group()[12:-3])
+                
+            random_img_url = img_list[random.randint(0, len(img_list)+1)]
+            print('fetch img url finish')
+            print(random_img_url)
+            
+            line_bot_api.reply_message(
                 event.reply_token,
-                TemplateSendMessage(  # 選單
-                    alt_text='Buttons template',
-                    template=ButtonsTemplate(
-                        title='功能選單',
-                        text='請選擇功能',
-                        actions=[
-                            MessageTemplateAction(
-                                label='購買商品',
-                                text='購買商品',
-                                data='A&func1'
-                            ),
-                            MessageTemplateAction(
-                                label='快速上架',
-                                text='快速上架',
-                                data='A&func2'
-                            ),
-                            MessageTemplateAction(
-                                label='物流追蹤',
-                                text='物流追蹤',
-                                data='A&func3'
-                            )
-                        ]
-                    )
+                ImageSendMessage(
+                    original_content_url=random_img_url,
+                    preview_image_url=random_img_url
                 )
             )
-    elif isinstance(event, PostbackEvent):
-        if event.postback.data == "A&func1":  # 如果回傳值為「購買商品」
-            text_reply('請輸入關鍵字:')
+        # 如果找不到圖，就學你說話
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=event.message.text)
+            )
+            pass
+
+if __name__ == "__main__":
+    app.run()
