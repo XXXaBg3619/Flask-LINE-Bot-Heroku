@@ -37,6 +37,7 @@ def callback():
 def handle_message(event):
     
     if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
+        print("1")
         try:
             url = f"https://pixabay.com/images/search/{urllib.parse.urlencode({'q':event.message.text})[2:]}/"
             headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36'}
