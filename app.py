@@ -55,8 +55,7 @@ def handle_message(event):
             pattern = '"(https://encrypted-tbn0.gstatic.com[\S]*)"'
 
             for match in re.finditer(pattern, str(data, "utf-8")):
-                if len(match.group(1)) < 150:
-                    img_list.append(match.group(1))
+                img_list.append(match.group(1))
 
             random_img_url = img_list[random.randint(0, len(img_list)+1)]
 
