@@ -34,7 +34,7 @@ def callback():
 
 # 請 pixabay 幫我們找圖
 @handler.add(MessageEvent, message=TextMessage)
-def pixabay_isch(event):
+def handle_message(event):
     
     if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
         try:
