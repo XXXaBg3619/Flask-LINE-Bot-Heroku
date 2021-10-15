@@ -57,6 +57,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, message)
     # 如果找不到圖，就學你說話
     except:
+        print("no picture")
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=event.message.text)
