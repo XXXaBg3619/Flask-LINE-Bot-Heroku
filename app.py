@@ -13,7 +13,7 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 send_products_limit = 5    # 每次傳送之商品數上限
-last_search = ["", [], 0]    # 最新一次搜尋商品的名稱/紀錄/頁數
+last_search = ["", [], 0, 0]    # 最新一次搜尋商品的名稱/紀錄/頁數/抓下來的商品數
 
 
 # PChome線上購物 爬蟲
@@ -177,9 +177,9 @@ def handle_message(event):
     if text.isdigit() == False:
         print("check point 1")
         products = pchome_spider.search_products(text)
-        last_search = [text, products, 1]
+        last_search = [text, products, 1, len(products)]
     # 查找頁數(已爬下來)
-    elif len(last_search[1])//5 >= int(text):
+    elif len(last_search[3]) >= int(text) * send_products_limit:
         print("check point 2")
         products = last_search[1]
         last_search[2] = int(text)
@@ -187,9 +187,9 @@ def handle_message(event):
     else:
         print("check point 3")
         products = pchome_spider.search_products(last_search[0], int(text)//4 + 1)
-        last_search[1::] = [products, int(text)]
+        last_search[1::] = [products, int(text), len(products)]
     large_len = 0
-    print(last_search[0], len(last_search[1]), last_search[2])
+    print(last_search[0], last_search[2::])
     try:
         for i in range(send_products_limit*(last_search[2]-1), send_products_limit*last_search[2]):
             message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
@@ -203,7 +203,7 @@ def handle_message(event):
         message += " " * (large_len//2) + f"[第{last_search[2]}頁]"
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     except:
-        print("cpmpare:", len(last_search[1])//5, int(text))
+        print("cpmpare:", last_search[3], int(text))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
     #     event.reply_token,
