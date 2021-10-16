@@ -83,7 +83,7 @@ class PchomeSpider():
         if is_ipost_pickup:
             params['ipost'] = 'Y'   # i 郵箱取貨
 
-        while params['page'] < max_page:
+        while params['page'] < max_page and len(products) < 10:
             params['page'] += 1
             data = self.request_get(url, params)
             if not data:
