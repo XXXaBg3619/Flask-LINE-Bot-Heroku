@@ -197,7 +197,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     except:
         print("cpmpare:", len(products[1]), int(text))
-    print(products[0], products[2])
+    print(products[0], len(products[1]), products[2])
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
     #     event.reply_token,
