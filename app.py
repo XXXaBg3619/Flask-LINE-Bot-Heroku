@@ -167,6 +167,7 @@ def callback():
 # 使用 pchome 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    print(urllib.parse.urlencode({'q': event.message.text}))
     try:
         products = pchome_spider.search_products(keyword = urllib.parse.urlencode({'q': event.message.text}))
         message = ""
