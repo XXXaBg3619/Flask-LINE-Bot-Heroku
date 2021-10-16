@@ -203,7 +203,7 @@ def handle_message(event):
         message += " " * (large_len//2) + f"[第{last_search[2]}頁]"
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     except:
-        print(send_products_limit*(last_search[2]-1), send_products_limit*last_search[2])
+        print("cpmpare:", len(last_search[1])//5, int(text))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
     #     event.reply_token,
