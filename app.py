@@ -189,7 +189,6 @@ def handle_message(event):
         products = pchome_spider.search_products(last_search[0], int(text)//4 + 1)
         last_search[1::] = [products, int(text), len(products)]
     large_len = 0
-    print(last_search[0], last_search[2::])
     try:
         for i in range(send_products_limit*(last_search[2]-1), send_products_limit*last_search[2]):
             message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
@@ -204,6 +203,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     except:
         print("cpmpare:", last_search[3], int(text))
+    print(last_search[0], last_search[2::])
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
     #     event.reply_token,
