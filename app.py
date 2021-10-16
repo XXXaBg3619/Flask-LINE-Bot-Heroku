@@ -152,15 +152,12 @@ pchome_spider = PchomeSpider()
 @app.route("/", methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']
-
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
-
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
-
     return 'OK'
 
 # 使用 pchome 搜尋商品
@@ -172,6 +169,7 @@ def handle_message(event):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
+    print(message)
     TextSendMessage(text = message)
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
