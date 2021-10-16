@@ -179,7 +179,7 @@ def handle_message(event):
         products = pchome_spider.search_products(text)
         last_search = [text, products, 1, len(products)]
     # 查找頁數(已爬下來)
-    elif len(last_search[3]) >= int(text) * send_products_limit:
+    elif last_search[3] >= int(text) * send_products_limit:
         print("check point 2")
         products = last_search[1]
         last_search[2] = int(text)
