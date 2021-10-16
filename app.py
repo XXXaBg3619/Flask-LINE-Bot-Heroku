@@ -13,6 +13,7 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 send_products_limit = 5    # 每次傳送之商品數上限
+last_search = ""    # 最新一次搜尋商品的紀錄
 
 
 # PChome線上購物 爬蟲
@@ -169,11 +170,14 @@ def callback():
 # 使用 pchome 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    global last_search
     message = ""
     if event.message.text.isdigit() == False:
         products = pchome_spider.search_products(keyword = event.message.text)
+        last_search = products
         initial_page = 0
     else:
+        products = last_search
         initial_page = int(event.message.text)
     large_len = 0
     for i in range(initial_page, initial_page + send_products_limit):
@@ -185,7 +189,7 @@ def handle_message(event):
             len(products[i]["name"]), 
             len("$" + str(products[i]["price"]))
             )
-    message += " " * (large_len//2) + f"第{max(1, initial_page)}頁"
+    message += " " * (large_len//2) + f"[第{max(1, initial_page)}頁]"
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
