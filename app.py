@@ -12,6 +12,9 @@ line_bot_api = LineBotApi("S1NRUscHr3pXdpnYh28UZlZmeEnmEbfX6rkSC3WHo/zSbBxUJcKgL
 handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
+send_products_limit = 5    # 每次傳送之商品數上限
+
+
 # PChome線上購物 爬蟲
 class PchomeSpider():
     def __init__(self):
@@ -83,7 +86,7 @@ class PchomeSpider():
         if is_ipost_pickup:
             params['ipost'] = 'Y'   # i 郵箱取貨
 
-        while params['page'] < max_page and len(products) < 10:
+        while params['page'] < max_page:
             params['page'] += 1
             data = self.request_get(url, params)
             if not data:
@@ -166,16 +169,13 @@ def callback():
 # 使用 pchome 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    products = pchome_spider.search_products(keyword = event.message.text)
+    products = pchome_spider.search_products(keyword = urllib.parse.urlencode({'q': event.message.text}))
     message = ""
-    for i in range(10):
+    for i in range(send_products_limit):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text = message)
-    )
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
     #     event.reply_token,
