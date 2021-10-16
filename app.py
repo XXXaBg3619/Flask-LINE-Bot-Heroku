@@ -13,7 +13,7 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 send_products_limit = 5    # 每次傳送之商品數上限
-last_search = ["", []]    # 最新一次搜尋商品的名稱/紀錄
+last_search = ["", [], 0]    # 最新一次搜尋商品的名稱/紀錄/頁數
 
 
 # PChome線上購物 爬蟲
@@ -172,20 +172,22 @@ def callback():
 def handle_message(event):
     global last_search
     message = ""
-    if event.message.text.isdigit() == False:
-        products = pchome_spider.search_products(event.message.text)
-        initial_page = 0
-        last_search = [event.message.text, products]
-    elif event.message.text.isdigit() == True and len(last_search[1])//5 < int(event.message.text):
-        products = pchome_spider.search_products(last_search[0], int(event.message.text)//4 + 1)
-        initial_page = int(event.message.text) - 1
-        last_search[1] = products
-    else:
+    text = event.message.text
+    # 搜尋商品時
+    if text.isdigit() == False:
+        products = pchome_spider.search_products(text)
+        last_search = [text, products, 1]
+    # 查找頁數(已爬下來)
+    elif len(last_search[1])//5 >= int(text):
         products = last_search[1]
-        initial_page = int(event.message.text) - 1
+        last_search[2] = int(text)
+    # 查找頁數(未爬下來)
+    else:
+        products = pchome_spider.search_products(last_search[0], int(text)//4 + 1)
+        last_search[1::] = [products, int(text)]
     large_len = 0
-    print(last_search[0])
-    for i in range(5*initial_page, 5*initial_page + send_products_limit):
+    print(last_search[0], last_search[2])
+    for i in range(send_products_limit*(last_search[2]-1), send_products_limit*last_search[2]):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
@@ -194,7 +196,7 @@ def handle_message(event):
             len(products[i]["name"]), 
             len("$" + str(products[i]["price"]))
             )
-    message += " " * (large_len//2) + f"[第{initial_page + 1}頁]"
+    message += " " * (large_len//2) + f"[第{last_search[2]}頁]"
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
