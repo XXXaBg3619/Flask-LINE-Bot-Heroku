@@ -175,14 +175,17 @@ def handle_message(event):
     text = event.message.text
     # 搜尋商品時
     if text.isdigit() == False:
+        print("check point 1")
         products = pchome_spider.search_products(text)
         last_search = [text, products, 1]
     # 查找頁數(已爬下來)
     elif len(last_search[1])//5 >= int(text):
+        print("check point 2")
         products = last_search[1]
         last_search[2] = int(text)
     # 查找頁數(未爬下來)
     else:
+        print("check point 3")
         products = pchome_spider.search_products(last_search[0], int(text)//4 + 1)
         last_search[1::] = [products, int(text)]
     large_len = 0
