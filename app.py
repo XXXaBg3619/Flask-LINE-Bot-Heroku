@@ -69,7 +69,7 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 #TextSendMessage(text=event.message.text)
-                TextSendMessage(text="https://www.learncodewithmike.com/2020/02/python-beautifulsoup-web-scraper.html")
+                TextSendMessage(text="https://24h.pchome.com.tw/prod/DGBJGB-1900AZWIA")
             )
             pass
 
