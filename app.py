@@ -178,10 +178,9 @@ def handle_message(event):
         initial_page = 0
     else:
         products = last_search
-        initial_page = int(event.message.text)
+        initial_page = int(event.message.text) - 1
     large_len = 0
-    print(len(products))
-    for i in range(initial_page, initial_page + send_products_limit):
+    for i in range(5*initial_page, 5*initial_page + send_products_limit):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
@@ -190,7 +189,7 @@ def handle_message(event):
             len(products[i]["name"]), 
             len("$" + str(products[i]["price"]))
             )
-    message += " " * (large_len//2) + f"[第{max(1, initial_page)}頁]"
+    message += " " * (large_len//2) + f"[第{initial_page + 1}頁]"
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
