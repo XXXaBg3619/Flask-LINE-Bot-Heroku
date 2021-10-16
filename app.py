@@ -185,7 +185,7 @@ def handle_message(event):
             len(products[i]["name"]), 
             len("$" + str(products[i]["price"]))
             )
-    message += " " * large_len//2 + f"第{max(1, initial_page}頁"
+    message += " " * large_len//2 + f"第{max(1, initial_page)}頁"
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
