@@ -68,7 +68,8 @@ def handle_message(event):
         except:
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text=event.message.text)
+                #TextSendMessage(text=event.message.text)
+                TextSendMessage(text="https://www.learncodewithmike.com/2020/02/python-beautifulsoup-web-scraper.html")
             )
             pass
 
