@@ -169,7 +169,7 @@ def handle_message(event):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
-    print(message)
+    print(type(event.message.text))
     TextSendMessage(text = message)
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
