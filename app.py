@@ -176,7 +176,7 @@ def handle_message(event):
         products = pchome_spider.search_products(event.message.text)
         initial_page = 0
         last_search = [event.message.text, products]
-    elif len(last_search[1])//5 < int(event.message.text):
+    elif event.message.text.isdigit() == True and len(last_search[1])//5 < int(event.message.text):
         products = pchome_spider.search_products(last_search[0], int(event.message.text)//4 + 1)
         initial_page = int(event.message.text) - 1
         last_search[1] = products
