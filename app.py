@@ -170,7 +170,7 @@ def handle_message(event):
     products = pchome_spider.search_products(keyword = urllib.parse.urlencode({'q': event.message.text}))
     message = ""
     for i in range(10):
-        pchome_products_url = pchome_url + products[i]["id"]
+        pchome_products_url = pchome_url + products[i]["Id"]
         message += (
             pchome_products_url + "\n" +
             products[i]["name"] + "\n" +
