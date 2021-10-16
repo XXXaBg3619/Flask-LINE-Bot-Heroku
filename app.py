@@ -13,7 +13,7 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 send_products_limit = 5    # 每次傳送之商品數上限
-last_search = ""    # 最新一次搜尋商品的紀錄
+last_search = ["", []]    # 最新一次搜尋商品的名稱/紀錄
 
 
 # PChome線上購物 爬蟲
@@ -174,15 +174,16 @@ def handle_message(event):
     message = ""
     if event.message.text.isdigit() == False:
         products = pchome_spider.search_products(event.message.text)
-        last_search = products
         initial_page = 0
-    elif len(last_search)//5 < int(event.message.text):
-        products = pchome_spider.search_products(event.message.text, int(event.message.text)//4 + 1)
-        last_search = products
+        last_search = [event.message.text, products]
+    elif len(last_search[1])//5 < int(event.message.text):
+        products = pchome_spider.search_products(last_search[0], int(event.message.text)//4 + 1)
         initial_page = int(event.message.text) - 1
+        last_search[1] = products
     else:
-        products = last_search
+        products = last_search[1]
         initial_page = int(event.message.text) - 1
+        last_search[2] = initial_page
     large_len = 0
     for i in range(5*initial_page, 5*initial_page + send_products_limit):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
