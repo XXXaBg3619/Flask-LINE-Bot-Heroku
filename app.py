@@ -147,7 +147,6 @@ class PchomeSpider():
         data = self.request_get(url)
         return data
 pchome_spider = PchomeSpider()
-pchome_url = "https://24h.pchome.com.tw/prod/"
 
 # 接收 LINE 的資訊
 @app.route("/", methods=['POST'])
@@ -170,12 +169,9 @@ def handle_message(event):
     products = pchome_spider.search_products(keyword = urllib.parse.urlencode({'q': event.message.text}))
     message = ""
     for i in range(10):
-        pchome_products_url = pchome_url + products[i]["Id"]
-        message += (
-            pchome_products_url + "\n" +
-            products[i]["name"] + "\n" +
-            products[i]["price"] + "\n"
-        )
+        message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
+        message += products[i]["name"] + "\n"
+        message += "$" + str(products[i]["price"]) + "\n"
     TextSendMessage(text = message)
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
