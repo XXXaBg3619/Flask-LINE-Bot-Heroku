@@ -167,23 +167,20 @@ def callback():
 # 使用 pchome 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    print(urllib.parse.urlencode({'q': event.message.text}))
-    try:
-        products = pchome_spider.search_products(keyword = urllib.parse.urlencode({'q': event.message.text}))
-        message = ""
-        for i in range(10):
-            message += (
-                pchome_products_url + products["id"] + "\n",
-                products["name"] + "\n",
-                products["price"] + "\n"
-            )
-        TextSendMessage(text = message)
-    # 如果搜不到商品，就學你說話
-    except:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=event.message.text)
+    products = pchome_spider.search_products(keyword = urllib.parse.urlencode({'q': event.message.text}))
+    message = ""
+    for i in range(10):
+        message += (
+            pchome_products_url + products["id"] + "\n",
+            products["name"] + "\n",
+            products["price"] + "\n"
         )
+    TextSendMessage(text = message)
+    # 如果搜不到商品，就學你說話
+    # line_bot_api.reply_message(
+    #     event.reply_token,
+    #     TextSendMessage(text=event.message.text)
+    # )
 
 if __name__ == "__main__":
     app.run()
