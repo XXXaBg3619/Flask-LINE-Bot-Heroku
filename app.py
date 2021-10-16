@@ -173,12 +173,15 @@ def handle_message(event):
     global last_search
     message = ""
     if event.message.text.isdigit() == False:
-        products = pchome_spider.search_products(keyword = event.message.text)
+        products = pchome_spider.search_products(event.message.text)
         last_search = products
         initial_page = 0
+    elif len(last_search)//5 < int(event.message.text):
+        products = pchome_spider.search_products(event.message.text, int(event.message.text)//4 + 1)
+        last_search = products
+        initial_page = int(event.message.text) - 1
     else:
         products = last_search
-        initial_page = int(event.message.text) - 1
     large_len = 0
     for i in range(5*initial_page, 5*initial_page + send_products_limit):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
