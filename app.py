@@ -180,8 +180,12 @@ def handle_message(event):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
-        large_len = max("https://24h.pchome.com.tw/prod/"+products[i]["Id"], products[i]["name"], "$" + str(products[i]["price"]))
-    message += " " * large_len//2 + f"第{initial_page + 1}頁"
+        large_len = max(
+            len("https://24h.pchome.com.tw/prod/"+products[i]["Id"]), 
+            len(products[i]["name"]), 
+            len("$" + str(products[i]["price"]))
+            )
+    message += " " * large_len//2 + f"第{max(1, initial_page}頁"
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
