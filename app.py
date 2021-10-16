@@ -169,12 +169,17 @@ def callback():
 # 使用 pchome 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    products = pchome_spider.search_products(keyword = urllib.parse.urlencode({'q': event.message.text}))
+    products = pchome_spider.search_products(keyword = event.message.text)
     message = ""
-    for i in range(send_products_limit):
+    if event.message.text.isdigit() == True:
+        initial_page = int(event.message.text)
+    else:
+        initial_page = 0
+    for i in range(initial_page, initial_page + send_products_limit):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
+    message += " " * 8 + f"第{initial_page}頁"
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
