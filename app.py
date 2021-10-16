@@ -182,6 +182,7 @@ def handle_message(event):
         initial_page = int(event.message.text) - 1
     else:
         products = last_search
+        initial_page = int(event.message.text) - 1
     large_len = 0
     for i in range(5*initial_page, 5*initial_page + send_products_limit):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
