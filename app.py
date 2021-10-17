@@ -110,7 +110,7 @@ def pchome(name, page = 1):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
-    message += " " * 10 + f"[第{page}頁]"
+    message += " " * 20 + f"[第{page}頁]"
     return message
 
 # MOMO線上購物 爬蟲
@@ -140,16 +140,16 @@ def momo_search(keyword, pages = 1):
     lower_bond = limit * (fix - 1)
     upper_bound = limit * fix if limit * fix != len(urls) else -1
     for i, url in enumerate(urls[lower_bond:upper_bound]):
+        print("length:", len(urls[lower_bond:upper_bound]))
         info = {}
         resp = requests.get(url, headers=headers)
         soup = BeautifulSoup(resp.text, features="html.parser")
         title = soup.find('meta',{'property':'og:title'})['content']
-        link = soup.find('meta',{'property':'og:url'})['content']
         try:
-            price = re.sub(r'\r\n| ','',soup.find('del').text)
-        except:
             price = soup.find('meta',{'property':'product:price:amount'})['content']
-        info["link"] = link
+        except:
+            price = re.sub(r'\r\n| ','',soup.find('del').text)
+        info["link"] = url
         info["name"] = title
         info["price"] = price
         products.append(info)
@@ -174,7 +174,7 @@ def momo(name, pages = 1):
         message += products[i]["link"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + products[i]["price"] + "\n"
-    message += " " * 10 + f"[第{pages}頁]"
+    message += " " * 20 + f"[第{pages}頁]"
     return message
         
 
