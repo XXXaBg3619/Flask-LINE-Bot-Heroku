@@ -119,7 +119,7 @@ def momo_search(keyword, pages = 1):
     urls = []
     try:
         with open("urls_momo.json") as file:
-            urls = json.load(file)[:5]
+            urls = json.load(file)[:limit]
     except:
         page = (limit * pages) // 20 + 1
         url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
@@ -130,15 +130,12 @@ def momo_search(keyword, pages = 1):
                 urls.append('https://m.momoshop.com.tw'+item['href'])
         with open("urls_momo.json", "w") as file:
             json.dump(urls, file)
-        urls = urls[:5]
-    amount = len(urls)//limit
-    if pages % amount == 1:
+        urls = urls[:limit]
+    if pages % (20//limit) == 1:
         products = []
-        fix = 1
     else:
         with open("products_info_momo.json") as file:
             products = json.load(file)
-        fix = limit if pages % amount == 0 else pages % amount
     for i, url in enumerate(urls):
         resp = requests.get(url, headers=headers)
         soup = BeautifulSoup(resp.text, features="html.parser")
@@ -158,7 +155,7 @@ def momo(name, pages = 1):
             products = json.load(file)
     except:
         products = []
-    if pages == 1 or products == []:
+    if pages % (20//limit) == 1 or products == []:
         print("搜尋商品時")
         products = momo_search(name)
     elif len(products) < pages * limit:
