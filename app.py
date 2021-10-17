@@ -13,7 +13,6 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 send_products_limit = 5    # 每次傳送之商品數上限
-product_name = ""    # 商品的名稱
 
 
 # PChome線上購物 爬蟲
@@ -167,21 +166,21 @@ def callback():
 # 使用 pchome 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    global product_name
     message = ""
     text = event.message.text
     try:
         with open("porducts_info.json") as file:
             products = json.load(file)
+        product_name = products[-1]["name"]
     except:
         products = [False]
     # 搜尋商品時
     if text.isdigit() == False:
         print("check point 1")
         products = pchome_spider.search_products(text)
+        products[-1]["name"] = text
         with open("porducts_info.json", "w") as file:
             json.dump(products, file)
-        product_name = text
         pages = 1
     # 查找頁數(已爬下來)
     elif len(products) >= int(text) * send_products_limit:
@@ -191,6 +190,7 @@ def handle_message(event):
     else:
         print("check point 3")
         products = pchome_spider.search_products(product_name, int(text)//4 + 1)
+        products[-1]["name"] = product_name
         with open("porducts_info.json", "w") as file:
             json.dump(products, file)
         pages = int(text)
@@ -209,7 +209,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     except:
         print("cpmpare:", products, int(text))
-    print(product_name, pages)
+    print(products[-1]["name"], pages)
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
     #     event.reply_token,
