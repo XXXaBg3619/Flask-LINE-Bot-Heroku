@@ -13,7 +13,7 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 send_products_limit = 5    # 每次傳送之商品數上限
-products = ["", [], 0]    # 最新一次搜尋商品的名稱/資訊/頁數
+product_name = ""    # 商品的名稱
 
 
 # PChome線上購物 爬蟲
@@ -167,37 +167,46 @@ def callback():
 # 使用 pchome 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    global products
+    global product_name
     message = ""
     text = event.message.text
+    with open("porducts_info.json") as file:
+        products = json.load(file)
     # 搜尋商品時
     if text.isdigit() == False:
         print("check point 1")
-        products = [text, pchome_spider.search_products(text), 1]
+        products = pchome_spider.search_products(text)
+        with open("porducts_info.json", "w") as file:
+            json.dump(products, file)
+        product_name = text
+        pages = 1
     # 查找頁數(已爬下來)
-    elif len(products[1]) >= int(text) * send_products_limit:
+    elif len(products) >= int(text) * send_products_limit:
         print("check point 2")
-        products[2] = int(text)
+        pages = int(text)
     # 查找頁數(未爬下來)
     else:
         print("check point 3")
-        products[1::] = [pchome_spider.search_products(products[0], int(text)//4 + 1), int(text)]
+        products = pchome_spider.search_products(product_name, int(text)//4 + 1)
+        with open("porducts_info.json", "w") as file:
+            json.dump(products, file)
+        pages = int(text)
     large_len = 0
     try:
-        for i in range(send_products_limit*(products[2]-1), send_products_limit*products[2]):
-            message += "https://24h.pchome.com.tw/prod/" + products[1][i]["Id"] + "\n"
-            message += products[1][i]["name"] + "\n"
-            message += "$" + str(products[1][i]["price"]) + "\n"
+        for i in range(send_products_limit*(pages-1), send_products_limit*pages):
+            message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
+            message += products[i]["name"] + "\n"
+            message += "$" + str(products[i]["price"]) + "\n"
             large_len = max(
-                len("https://24h.pchome.com.tw/prod/"+products[1][i]["Id"]), 
-                len(products[1][i]["name"]), 
-                len("$" + str(products[1][i]["price"]))
+                len("https://24h.pchome.com.tw/prod/"+products[i]["Id"]), 
+                len(products[i]["name"]), 
+                len("$" + str(products[i]["price"]))
                 )
-        message += " " * (large_len//2) + f"[第{products[2]}頁]"
+        message += " " * (large_len//2) + f"[第{pages}頁]"
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     except:
-        print("cpmpare:", len(products[1]), int(text))
-    print(products[0], len(products[1]), products[2])
+        print("cpmpare:", len(products), int(text))
+    print(product_name, prodpagesucts)
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
     #     event.reply_token,
