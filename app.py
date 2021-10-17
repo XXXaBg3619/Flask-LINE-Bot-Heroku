@@ -156,14 +156,16 @@ def momo(name, pages = 1):
     try:
         with open("products_info_momo.json") as file:
             products = json.load(file)
+        print("已有商品資訊")
     except:
         products = []
+        print("未有商品資訊")
     if pages % (20//limit) == 1 or products == []:
         print("搜尋商品時")
         products = momo_search(name)
     elif len(products) < pages * limit:
         print("查找頁數(未爬下來)")
-        products = momo_search(name, (pages * limit)//len(products)+1)
+        products += momo_search(name, (pages * limit)//len(products)+1)
     message = ""
     for i in range(limit*(pages-1), limit*pages):
         message += products[i]["link"] + "\n"
