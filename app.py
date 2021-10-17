@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
-import os, json, requests, configparser, urllib, re, random
+import json, requests
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 
 app = Flask(__name__)
@@ -100,56 +100,32 @@ class PchomeSpider():
                 break
         return products
 
-    # 取得商品販售狀態
-    def get_products_sale_status(self, products_id):
-        """
-        param products_id: 商品 ID
-        return data: 商品販售狀態資料
-        """
-        if type(products_id) == list:
-            products_id = ','.join(products_id)
-        url = f'https://ecapi.pchome.com.tw/ecshop/prodapi/v2/prod/button&id={products_id}'
-        data = self.request_get(url)
-        if not data:
-            print(f'請求發生錯誤：{url}')
-            return []
-        return data
+def pchome(name, page = 1):
+    try:
+        with open("pchome_porducts_info.json") as file:
+            products = json.load(file)
+    except:
+        products = []
+    # 搜尋商品時
+    if page == 1 or products == []:
+        print("搜尋商品時")
+        products = PchomeSpider().search_products(name)
+        with open("pchome_porducts_info.json", "w") as file:
+            json.dump(products, file)
+    # 查找頁數(未爬下來)
+    elif len(products) < page * send_products_limit:
+        print("查找頁數(未爬下來)")
+        products = PchomeSpider().search_products(name, page//4 + 1)
+        with open("pchome_porducts_info.json", "w") as file:
+            json.dump(products, file)
+    message = ""
+    for i in range(send_products_limit*(page-1), send_products_limit*page):
+        message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
+        message += products[i]["name"] + "\n"
+        message += "$" + str(products[i]["price"]) + "\n"
+    message += " " * 10 + f"[第{page}頁]"
+    return message
 
-    # 取得商品規格種類
-    def get_products_specification(self, products_id):
-        """
-        param products_id: 商品 ID
-        return data: 商品規格種類
-        """
-        if type(products_id) == list:
-            products_id = ','.join(products_id)
-        url = f'https://ecapi.pchome.com.tw/ecshop/prodapi/v2/prod/spec&id={products_id}&_callback=jsonpcb_spec'
-        data = self.request_get(url, to_json=False)
-        data = json.loads(data[17:-48])    # 去除前後 JS 語法字串
-        return data
-
-    # 取得搜尋商品分類(網頁左側)
-    def get_search_category(self, keyword):
-        """
-        param keyword: 搜尋關鍵字
-        return data: 分類資料
-        """
-        url = f'https://ecshweb.pchome.com.tw/search/v3.3/all/categories?q={keyword}'
-        data = self.request_get(url)
-        return data
-
-    # 取得商品子分類的名稱(網頁左側)
-    def get_search_categories_name(self, categories_id):
-        """
-        param categories_id: 分類 ID
-        return data: 子分類名稱資料
-        """
-        if type(categories_id) == list:
-            categories_id = ','.join(categories_id)
-        url = f'https://ecapi-pchome.cdn.hinet.net/cdn/ecshop/cateapi/v1.5/store&id={categories_id}&fields=Id,Name'
-        data = self.request_get(url)
-        return data
-pchome_spider = PchomeSpider()
 
 # 接收 LINE 的資訊
 @app.route("/", methods=['POST'])
@@ -163,58 +139,23 @@ def callback():
         abort(400)
     return 'OK'
 
-# 使用 pchome 搜尋商品
+# 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     message = ""
     text = event.message.text
-    try:
-        with open("porducts_info.json") as file:
-            products = json.load(file)
-        product_name = products[-1]["name"]
-    except:
-        products = [False]
-    # 搜尋商品時
-    if text.isdigit() == False:
-        print("check point 1")
-        products = pchome_spider.search_products(text)
-        products[-1]["name"] = text
-        with open("porducts_info.json", "w") as file:
-            json.dump(products, file)
-        pages = 1
-    # 查找頁數(已爬下來)
-    elif len(products) >= int(text) * send_products_limit:
-        print("check point 2")
-        pages = int(text)
-    # 查找頁數(未爬下來)
+    if ";" in text:
+        info = {"platform": text[text.index(";")+1::], "search_name" : text[::text.index(";")]}
+        if info["platform"] == "pchome":
+            message = pchome(info["search_name"])
+            with open("search_info.json", "w") as file:
+                json.dump(info, file)
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     else:
-        print("check point 3")
-        products = pchome_spider.search_products(product_name, int(text)//4 + 1)
-        products[-1]["name"] = product_name
-        with open("porducts_info.json", "w") as file:
-            json.dump(products, file)
-        pages = int(text)
-    large_len = 0
-    try:
-        for i in range(send_products_limit*(pages-1), send_products_limit*pages):
-            message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
-            message += products[i]["name"] + "\n"
-            message += "$" + str(products[i]["price"]) + "\n"
-            large_len = max(
-                len("https://24h.pchome.com.tw/prod/"+products[i]["Id"]), 
-                len(products[i]["name"]), 
-                len("$" + str(products[i]["price"]))
-                )
-        message += " " * (large_len//2) + f"[第{pages}頁]"
+        with open("search_info.json") as file:
+            info = json.load(file)
+        message = pchome(info["search_name"], text)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
-    except:
-        print("cpmpare:", products, int(text))
-    print(products[-1]["name"], pages)
-    # 如果搜不到商品，就學你說話
-    # line_bot_api.reply_message(
-    #     event.reply_token,
-    #     TextSendMessage(text=event.message.text)
-    # )
 
 if __name__ == "__main__":
     app.run()
