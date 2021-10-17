@@ -170,8 +170,11 @@ def handle_message(event):
     global product_name
     message = ""
     text = event.message.text
-    with open("porducts_info.json", "r") as file:
-        products = json.load(file)
+    try:
+        with open("porducts_info.json") as file:
+            products = json.load(file)
+    except:
+        products = []
     # 搜尋商品時
     if text.isdigit() == False:
         print("check point 1")
