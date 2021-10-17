@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
-import json, requests
+import json, requests, re
+import pandas as pd
+from bs4 import BeautifulSoup
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
@@ -18,18 +20,14 @@ send_products_limit = 5    # 每次傳送之商品數上限
 # PChome線上購物 爬蟲
 class PchomeSpider():
     def __init__(self):
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36',
-        }
+        self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36'}
 
     # 送出 GET 請求
     def request_get(self, url, params=None, to_json=True):
-        """
-        param url: 請求網址
-        param params: 傳遞參數資料
-        param to_json: 是否要轉為 JSON 格式
-        return data: requests 回應資料
-        """
+        # param url: 請求網址
+        # param params: 傳遞參數資料
+        # param to_json: 是否要轉為 JSON 格式
+        # return data: requests 回應資料
         r = requests.get(url, params)
         print(r.url)
         if r.status_code != requests.codes.ok:
@@ -46,17 +44,15 @@ class PchomeSpider():
 
     # 搜尋商品
     def search_products(self, keyword, max_page=1, shop='全部', sort='有貨優先', price_min=-1, price_max=-1, is_store_pickup=False, is_ipost_pickup=False):
-        """
-        param keyword: 搜尋關鍵字
-        param max_page: 抓取最大頁數
-        param shop: 賣場類別 (全部、24h購物、24h書店、廠商出貨、PChome旅遊)
-        param sort: 商品排序 (有貨優先、精準度、價錢由高至低、價錢由低至高、新上市)
-        param price_min: 篩選"最低價" (需與 price_max 同時用)
-        param price_max: 篩選"最高價" (需與 price_min 同時用)
-        param is_store_pickup: 篩選"超商取貨"
-        param is_ipost_pickup: 篩選"i 郵箱取貨"
-        return products: 搜尋結果商品
-        """
+        # param keyword: 搜尋關鍵字
+        # param max_page: 抓取最大頁數
+        # param shop: 賣場類別 (全部、24h購物、24h書店、廠商出貨、PChome旅遊)
+        # param sort: 商品排序 (有貨優先、精準度、價錢由高至低、價錢由低至高、新上市)
+        # param price_min: 篩選"最低價" (需與 price_max 同時用)
+        # param price_max: 篩選"最高價" (需與 price_min 同時用)
+        # param is_store_pickup: 篩選"超商取貨"
+        # param is_ipost_pickup: 篩選"i 郵箱取貨"
+        # return products: 搜尋結果商品
         products = []
         all_shop = {
             '全部': 'all',
@@ -74,11 +70,7 @@ class PchomeSpider():
         }
 
         url = f'https://ecshweb.pchome.com.tw/search/v3.3/{all_shop[shop]}/results'
-        params = {
-            'q': keyword,
-            'sort': all_sort[sort],
-            'page': 0
-        }
+        params = {'q': keyword, 'sort': all_sort[sort], 'page': 0}
         if price_min >= 0 and price_max >= 0:
             params['price'] = f'{price_min}-{price_max}'
         if is_store_pickup:
@@ -98,6 +90,8 @@ class PchomeSpider():
             products.extend(data['prods'])
             if data['totalPage'] <= params['page']:
                 break
+        with open("pchome_porducts_info.json", "w") as file:
+            json.dump(products, file)
         return products
 
 def pchome(name, page = 1):
@@ -106,19 +100,12 @@ def pchome(name, page = 1):
             products = json.load(file)
     except:
         products = []
-    print("products:", products)
-    # 搜尋商品時
     if page == 1 or products == []:
         print("搜尋商品時")
         products = PchomeSpider().search_products(name)
-        with open("pchome_porducts_info.json", "w") as file:
-            json.dump(products, file)
-    # 查找頁數(未爬下來)
     elif len(products) < page * send_products_limit:
         print("查找頁數(未爬下來)")
-        products = PchomeSpider().search_products(name, page//4 + 1)
-        with open("pchome_porducts_info.json", "w") as file:
-            json.dump(products, file)
+        products = PchomeSpider().search_products(name, (page*send_products_limit)//len(products)+1)
     message = ""
     for i in range(send_products_limit*(page-1), send_products_limit*page):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
@@ -127,6 +114,61 @@ def pchome(name, page = 1):
     message += " " * 10 + f"[第{page}頁]"
     return message
 
+# MOMO線上購物 爬蟲
+def momo_search(keyword, pages = 1):
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'}
+    urls = []
+    for page in range(1, pages+1):
+        url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
+        print(url)
+        resp = requests.get(url, headers=headers)
+        if resp.status_code == 200:
+            soup = BeautifulSoup(resp.text)
+            for item in soup.select('li.goodsItemLi > a'):
+                urls.append('https://m.momoshop.com.tw'+item['href'])
+        urls = list(set(urls))
+
+    products = []
+    for i, url in enumerate(urls):
+        info = {}
+        resp = requests.get(url, headers=headers)
+        soup = BeautifulSoup(resp.text)
+        title = soup.find('meta',{'property':'og:title'})['content']
+        link = soup.find('meta',{'property':'og:url'})['content']
+        try:
+            price = re.sub(r'\r\n| ','',soup.find('del').text)
+        except:
+            price = soup.find('meta',{'property':'product:price:amount'})['content']
+        info["link"] = link
+        info["name"] = title
+        info["price"] = price
+        products.append(info)
+    with open("products_info_momo.json", "w") as file:
+        json.dump(products, file)
+    return products
+    
+def momo(name, pages = 1):
+    try:
+        with open("products_info_momo.json") as file:
+            products = json.load(file)
+    except:
+        products = []
+    if pages == 1 or products == []:
+        print("搜尋商品時")
+        products = momo_search(name)
+    elif len(products) < pages * send_products_limit:
+        print("查找頁數(未爬下來)")
+        products = momo_search(name, (pages * send_products_limit)//len(products)+1)
+    message = ""
+    for i in range(send_products_limit*(pages-1), send_products_limit*pages):
+        message += products[i]["link"] + "\n"
+        message += products[i]["name"] + "\n"
+        message += "$" + products[i]["price"] + "\n"
+    message += " " * 10 + f"[第{pages}頁]"
+    return message
+        
+
+    
 
 # 接收 LINE 的資訊
 @app.route("/", methods=['POST'])
@@ -152,14 +194,19 @@ def handle_message(event):
         if info["platform"] == "pchome":
             print("Search on PChome")
             message = pchome(info["search_name"])
-            with open("search_info.json", "w") as file:
+        elif info["platform"] == "momo":
+            print("Search on MOMO")
+            message = momo(info["search_name"])
+        with open("search_info.json", "w") as file:
                 json.dump(info, file)
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
-    else:
+    elif text.isdigit() == True:
         with open("search_info.json") as file:
             info = json.load(file)
-        message = pchome(info["search_name"], int(text))
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
+        if info["platform"] == "pchome":
+            message = pchome(info["search_name"], int(text))
+        elif info["platform"] == "momo":
+            message = momo(info["search_name"], int(text))
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
 
 if __name__ == "__main__":
     app.run()
