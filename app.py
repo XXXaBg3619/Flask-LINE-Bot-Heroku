@@ -174,7 +174,7 @@ def handle_message(event):
         with open("porducts_info.json") as file:
             products = json.load(file)
     except:
-        products = []
+        products = [False]
     # 搜尋商品時
     if text.isdigit() == False:
         print("check point 1")
@@ -208,7 +208,7 @@ def handle_message(event):
         message += " " * (large_len//2) + f"[第{pages}頁]"
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     except:
-        print("cpmpare:", len(products), int(text))
+        print("cpmpare:", products, int(text))
     print(product_name, pages)
     # 如果搜不到商品，就學你說話
     # line_bot_api.reply_message(
