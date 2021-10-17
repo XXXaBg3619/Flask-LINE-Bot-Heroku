@@ -119,9 +119,10 @@ def momo_search(keyword, pages = 1):
     urls = []
     try:
         with open("urls_momo.json") as file:
-            urls = json.load(file)
+            urls = json.load(file)[::5]
     except:
-        url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(pages, keyword)
+        page = (limit * pages) // 20 + 1
+        url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
         resp = requests.get(url, headers=headers)
         if resp.status_code == 200:
             soup = BeautifulSoup(resp.text, features="html.parser")
@@ -137,11 +138,7 @@ def momo_search(keyword, pages = 1):
         with open("products_info_momo.json") as file:
             products = json.load(file)
         fix = limit if pages % amount == 0 else pages % amount
-    lower_bond = limit * (fix - 1)
-    upper_bound = limit * fix if limit * fix != len(urls) else -1
-    for i, url in enumerate(urls[lower_bond:upper_bound]):
-        print("length:", len(urls[lower_bond:upper_bound]))
-        info = {}
+    for i, url in enumerate(urls):
         resp = requests.get(url, headers=headers)
         soup = BeautifulSoup(resp.text, features="html.parser")
         title = soup.find('meta',{'property':'og:title'})['content']
@@ -149,10 +146,7 @@ def momo_search(keyword, pages = 1):
             price = soup.find('meta',{'property':'product:price:amount'})['content']
         except:
             price = re.sub(r'\r\n| ','',soup.find('del').text)
-        info["link"] = url
-        info["name"] = title
-        info["price"] = price
-        products.append(info)
+        products.append({"link": url, "name": title, "price": price})
     with open("products_info_momo.json", "w") as file:
         json.dump(products, file)
     return products
