@@ -170,7 +170,7 @@ def handle_message(event):
     global product_name
     message = ""
     text = event.message.text
-    with open("porducts_info.json") as file:
+    with open("porducts_info.json", "r") as file:
         products = json.load(file)
     # 搜尋商品時
     if text.isdigit() == False:
