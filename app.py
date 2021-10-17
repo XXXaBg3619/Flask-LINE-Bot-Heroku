@@ -117,14 +117,18 @@ def pchome(name, page = 1):
 def momo_search(keyword, pages = 1):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'}
     urls = []
-    for page in range(1, pages+1):
-        url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
-        print(url)
+    try:
+        with open("urls_momo.json") as file:
+            urls = json.load(file)
+    except:
+        url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(pages, keyword)
         resp = requests.get(url, headers=headers)
         if resp.status_code == 200:
-            soup = BeautifulSoup(resp.text)
+            soup = BeautifulSoup(resp.text, features="html.parser")
             for item in soup.select('li.goodsItemLi > a'):
                 urls.append('https://m.momoshop.com.tw'+item['href'])
+        with open("urls_momo.json", "w") as file:
+            json.dump(urls, file)
     amount = len(urls)//limit
     if pages % amount == 1:
         products = []
@@ -138,7 +142,7 @@ def momo_search(keyword, pages = 1):
     for i, url in enumerate(urls[lower_bond:upper_bound]):
         info = {}
         resp = requests.get(url, headers=headers)
-        soup = BeautifulSoup(resp.text)
+        soup = BeautifulSoup(resp.text, features="html.parser")
         title = soup.find('meta',{'property':'og:title'})['content']
         link = soup.find('meta',{'property':'og:url'})['content']
         try:
