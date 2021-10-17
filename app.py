@@ -120,14 +120,14 @@ def momo_search(keyword, pages = 1):
     amount = 20 // limit
     page = pages // amount + 1
     pages = pages % amount if pages % amount != 0 else 4
+    url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
+    resp = requests.get(url, headers=headers)
     if pages != 1:
         with open("urls_momo.json") as file:
             urls = json.load(file)
         with open("products_info_momo.json") as file:
             products = json.load(file)
     else:
-        url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
-        resp = requests.get(url, headers=headers)
         if resp.status_code == 200:
             soup = BeautifulSoup(resp.text, features="html.parser")
             for item in soup.select('li.goodsItemLi > a'):
