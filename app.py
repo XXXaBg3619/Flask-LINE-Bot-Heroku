@@ -119,7 +119,7 @@ def momo_search(keyword, pages = 1):
     urls = []
     try:
         with open("urls_momo.json") as file:
-            urls = json.load(file)[::5]
+            urls = json.load(file)[:5]
     except:
         page = (limit * pages) // 20 + 1
         url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
@@ -130,7 +130,7 @@ def momo_search(keyword, pages = 1):
                 urls.append('https://m.momoshop.com.tw'+item['href'])
         with open("urls_momo.json", "w") as file:
             json.dump(urls, file)
-        urls = urls[::5]
+        urls = urls[:5]
     amount = len(urls)//limit
     if pages % amount == 1:
         products = []
