@@ -13,7 +13,7 @@ line_bot_api = LineBotApi("S1NRUscHr3pXdpnYh28UZlZmeEnmEbfX6rkSC3WHo/zSbBxUJcKgL
 handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
-send_products_limit = 5    # 每次傳送之商品數上限
+limit = 5    # 每次傳送之商品數上限
 
 
 # PChome線上購物 爬蟲
@@ -102,11 +102,11 @@ def pchome(name, page = 1):
     if page == 1 or products == []:
         print("搜尋商品時")
         products = PchomeSpider().search_products(name)
-    elif len(products) < page * send_products_limit:
+    elif len(products) < page * limit:
         print("查找頁數(未爬下來)")
-        products = PchomeSpider().search_products(name, (page*send_products_limit)//len(products)+1)
+        products = PchomeSpider().search_products(name, (page*limit)//len(products)+1)
     message = ""
-    for i in range(send_products_limit*(page-1), send_products_limit*page):
+    for i in range(limit*(page-1), limit*page):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
@@ -125,10 +125,17 @@ def momo_search(keyword, pages = 1):
             soup = BeautifulSoup(resp.text)
             for item in soup.select('li.goodsItemLi > a'):
                 urls.append('https://m.momoshop.com.tw'+item['href'])
-        urls = list(set(urls))
-
-    products = []
-    for i, url in enumerate(urls):
+    amount = len(urls)//limit
+    if pages % amount == 1:
+        products = []
+        fix = 1
+    else:
+        with open("products_info_momo.json") as file:
+            products = json.load(file)
+        fix = limit if pages % amount == 0 else pages % amount
+    lower_bond = limit * (fix - 1)
+    upper_bound = limit * fix if limit * fix != len(urls) else -1
+    for i, url in enumerate(urls[lower_bond:upper_bound]):
         info = {}
         resp = requests.get(url, headers=headers)
         soup = BeautifulSoup(resp.text)
@@ -155,11 +162,11 @@ def momo(name, pages = 1):
     if pages == 1 or products == []:
         print("搜尋商品時")
         products = momo_search(name)
-    elif len(products) < pages * send_products_limit:
+    elif len(products) < pages * limit:
         print("查找頁數(未爬下來)")
-        products = momo_search(name, (pages * send_products_limit)//len(products)+1)
+        products = momo_search(name, (pages * limit)//len(products)+1)
     message = ""
-    for i in range(send_products_limit*(pages-1), send_products_limit*pages):
+    for i in range(limit*(pages-1), limit*pages):
         message += products[i]["link"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + products[i]["price"] + "\n"
