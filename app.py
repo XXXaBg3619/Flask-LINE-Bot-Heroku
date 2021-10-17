@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import json, requests, re, time
+import json, requests, re
 from bs4 import BeautifulSoup
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -117,42 +117,41 @@ def pchome(name, page = 1):
 def momo_search(keyword, pages = 1):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'}
     urls = []
-    try:
+    amount = 20 // limit
+    page = pages // amount + 1
+    pages = pages % amount if pages % amount != 0 else 4
+    if pages != 1:
         with open("urls_momo.json") as file:
             urls = json.load(file)
-    except:
-        page = (limit * pages) // 20 + 1
+        with open("products_info_momo.json") as file:
+            products = json.load(file)
+    else:
         url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
         resp = requests.get(url, headers=headers)
         if resp.status_code == 200:
             soup = BeautifulSoup(resp.text, features="html.parser")
             for item in soup.select('li.goodsItemLi > a'):
                 urls.append('https://m.momoshop.com.tw'+item['href'])
-    with open("urls_momo.json", "w") as file:
-        json.dump(urls[limit:], file)
-    urls = urls[:limit]
-    if pages % (20//limit) == 1:
+        with open("urls_momo.json", "w") as file:
+            json.dump(urls, file)
         products = []
-    else:
-        with open("products_info_momo.json") as file:
-            products = json.load(file)
-    start = time.time()
-    for i, url in enumerate(urls):
-        end = time.time()
-        print(i, end - start, "s")
-        resp = requests.get(url, headers=headers)
-        soup = BeautifulSoup(resp.text, features="html.parser")
-        title = soup.find('meta',{'property':'og:title'})['content']
+    urls = urls[limit*(pages-1):limit*pages]
+    for url in urls:
         try:
             price = soup.find('meta',{'property':'product:price:amount'})['content']
         except:
             price = re.sub(r'\r\n| ','',soup.find('del').text)
-        products.append({"link": url, "name": title, "price": price})
+        products.append({
+            "link": url, 
+            "name": soup.find('meta',{'property':'og:title'})['content'], 
+            "price": price
+            })
     with open("products_info_momo.json", "w") as file:
         json.dump(products, file)
     return products
     
 def momo(name, pages = 1):
+    amount = 20 // limit
     try:
         with open("products_info_momo.json") as file:
             products = json.load(file)
@@ -160,12 +159,10 @@ def momo(name, pages = 1):
     except:
         products = []
         print("未有商品資訊")
-    if pages % (20//limit) == 1 or products == []:
-        print("搜尋商品時")
+    if pages == 1:
         products = momo_search(name)
-    elif len(products) < pages * limit:
-        print("查找頁數(未爬下來)")
-        products += momo_search(name, (pages * limit)//len(products)+1)
+    else:
+        products += momo_search(name, pages)
     message = ""
     for i in range(limit*(pages-1), limit*pages):
         message += products[i]["link"] + "\n"
