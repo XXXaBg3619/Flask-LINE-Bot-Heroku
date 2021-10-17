@@ -136,7 +136,7 @@ def momo_search(keyword, pages = 1):
             json.dump(urls, file)
         products = []
     urls = urls[limit*(pages-1):limit*pages]
-    for url in urls:
+    for i, url in enumerate(urls):
         try:
             price = soup.find('meta',{'property':'product:price:amount'})['content']
         except:
