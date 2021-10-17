@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import json, requests, re
-import pandas as pd
 from bs4 import BeautifulSoup
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
