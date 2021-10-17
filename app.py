@@ -147,7 +147,9 @@ def handle_message(event):
     if ";" in text:
         info = {"platform": text[text.index(";")+1::], "search_name" : text[::text.index(";")]}
         if info["platform"] == "pchome":
+            print(f"Search {info["search_name"]} on PChome")
             message = pchome(info["search_name"])
+            print(message)
             with open("search_info.json", "w") as file:
                 json.dump(info, file)
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
