@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import json, requests, re
+import json, requests, re, time
 from bs4 import BeautifulSoup
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -119,7 +119,7 @@ def momo_search(keyword, pages = 1):
     urls = []
     try:
         with open("urls_momo.json") as file:
-            urls = json.load(file)[:limit]
+            urls = json.load(file)
     except:
         page = (limit * pages) // 20 + 1
         url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
@@ -128,15 +128,18 @@ def momo_search(keyword, pages = 1):
             soup = BeautifulSoup(resp.text, features="html.parser")
             for item in soup.select('li.goodsItemLi > a'):
                 urls.append('https://m.momoshop.com.tw'+item['href'])
-        with open("urls_momo.json", "w") as file:
-            json.dump(urls, file)
-        urls = urls[:limit]
+    with open("urls_momo.json", "w") as file:
+        json.dump(urls[limit:], file)
+    urls = urls[:limit]
     if pages % (20//limit) == 1:
         products = []
     else:
         with open("products_info_momo.json") as file:
             products = json.load(file)
+    start = time.time()
     for i, url in enumerate(urls):
+        end = time.time()
+        print(i, end - start, "s")
         resp = requests.get(url, headers=headers)
         soup = BeautifulSoup(resp.text, features="html.parser")
         title = soup.find('meta',{'property':'og:title'})['content']
