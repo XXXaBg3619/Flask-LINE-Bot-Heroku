@@ -106,6 +106,7 @@ def pchome(name, page = 1):
             products = json.load(file)
     except:
         products = []
+    print("products:", products)
     # 搜尋商品時
     if page == 1 or products == []:
         print("搜尋商品時")
@@ -146,8 +147,9 @@ def handle_message(event):
     text = event.message.text
     if ";" in text:
         info = {"platform": text[text.index(";")+1::], "search_name" : text[::text.index(";")]}
+        print("info:", info)
         if info["platform"] == "pchome":
-            print(f"Search {info["search_name"]} on PChome")
+            print("Search on PChome")
             message = pchome(info["search_name"])
             print(message)
             with open("search_info.json", "w") as file:
@@ -156,7 +158,7 @@ def handle_message(event):
     else:
         with open("search_info.json") as file:
             info = json.load(file)
-        message = pchome(info["search_name"], text)
+        message = pchome(info["search_name"], int(text))
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
 
 if __name__ == "__main__":
