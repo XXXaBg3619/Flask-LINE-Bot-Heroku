@@ -162,6 +162,8 @@ def momo(name, pages = 1):
         products = momo_search(name)
     else:
         products += momo_search(name, pages)
+    with open("products_info_momo.json", "w") as file:
+        json.dump(products, file)
     message = ""
     for i in range(limit*(pages-1), limit*pages):
         message += products[i]["link"] + "\n"
