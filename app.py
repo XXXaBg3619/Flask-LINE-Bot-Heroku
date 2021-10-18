@@ -187,11 +187,14 @@ def shopee_search(name, page = 1):
     products = []
     for item in data["items"]:
         title = item["name"]
-        title_fix = title.replace(" ", "-")
-        shopid = item["shopid"]
-        itemid = item["itemid"]
+        title_fix = str(title.replace(" ", "-").encode("utf-8"))[2:-2]
+        shopid, itemid = item["shopid"], item["itemid"]
         link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
-        price = int(item["price"]) // 100000
+        price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
+        if price_min == price_max:
+            price = str(int(item["price"]) // 100000)
+        else:
+            price = f"{price_min} ~ {price_max}"
         products.append({"link": link, "name": title, "price": price})
     return products
 
@@ -214,7 +217,7 @@ def shopee(name, page = 1):
     for i in range(limit*(page-1), limit*page):
         message += products[i]["link"] + "\n"
         message += products[i]["name"] + "\n"
-        message += "$" + str(products[i]["price"]) + "\n"
+        message += "$" + products[i]["price"] + "\n"
     message += " " * 20 + f"[第{page}頁]"
     return message
 
