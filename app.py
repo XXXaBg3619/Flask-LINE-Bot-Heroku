@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, with_statement
-import json, requests, re, urllib
+import json, requests, re, urllib, contextlib
 from urllib.parse import urlencode
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
