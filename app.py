@@ -1,5 +1,7 @@
-from __future__ import unicode_literals
+from __future__ import unicode_literals, with_statement
 import json, requests, re, urllib
+from urllib.parse import urlencode
+from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -14,6 +16,11 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 limit = 5    # 每次傳送之商品數上限
+
+def make_tiny(url):
+    request_url = "http://tinyurl.com/api-create.php?" + urlencode({"url": url})
+    with contextlib.closing(urlopen(request_url)) as response:
+        return response.read().decode("utf-8")
 
 
 # PChome線上購物 爬蟲
@@ -187,9 +194,8 @@ def shopee_search(name, page = 1):
     products = []
     for item in data["items"]:
         title = item["name"]
-        title_fix = str(title.replace(" ", "-").encode("utf-8"))[2:-2]
         shopid, itemid = item["shopid"], item["itemid"]
-        link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
+        link = make_tiny(f"https://shopee.tw/{title}-i.{shopid}.{itemid}")
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
             price = str(int(item["price"]) // 100000)
