@@ -214,7 +214,7 @@ def shopee(name, page = 1):
     for i in range(limit*(page-1), limit*page):
         message += products[i]["link"] + "\n"
         message += products[i]["name"] + "\n"
-        message += "$" + products[i]["price"] + "\n"
+        message += "$" + str(products[i]["price"]) + "\n"
     message += " " * 20 + f"[第{pages}頁]"
     return message
 
