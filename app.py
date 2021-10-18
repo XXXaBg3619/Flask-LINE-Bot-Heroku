@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import json, requests, re
+import json, requests, re, urllib
 from bs4 import BeautifulSoup
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -171,8 +171,54 @@ def momo(name, pages = 1):
         message += "$" + products[i]["price"] + "\n"
     message += " " * 20 + f"[第{pages}頁]"
     return message
-        
 
+
+# Shopee線上購物 爬蟲
+def shopee_search(name, page = 1):
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36 Edg/88.0.705.68',
+        'x-api-source': 'pc',
+        'referer': f'https://shopee.tw/search?keyword={urllib.parse.quote(name)}'
+    }
+    url = f'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={name}&limit=50&newest={50*(page-1)}&order=desc&page_type=search&version=2'
+    resq = requests.Session().get(url, headers=headers)
+    if resq.status_code == requests.codes.ok:
+        data = resq.json()
+    products = []
+    for item in data["items"]:
+        title = item["name"]
+        title_fix = title.replace(" ", "-")
+        shopid = item["shopid"]
+        itemid = item["itemid"]
+        link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
+        price = int(item["price"]) // 100000
+        products.append({"link": link, "name": title, "price": price})
+    return products
+
+def shopee(name, page = 1):
+    try:
+        with open("products_info_shopee.json") as file:
+            products = json.load(file)
+        print("已有商品資訊")
+    except:
+        products = []
+        print("未有商品資訊")
+    if page == 1:
+        products = shopee_search(name)
+    else:
+        pages = page // (50 // limit) + 1
+        products += shopee_search(name, pages)
+    with open("products_info_shopee.json", "w") as file:
+        json.dump(products, file)
+    message = ""
+    for i in range(limit*(page-1), limit*page):
+        message += products[i]["link"] + "\n"
+        message += products[i]["name"] + "\n"
+        message += "$" + products[i]["price"] + "\n"
+    message += " " * 20 + f"[第{pages}頁]"
+    return message
+
+    
     
 
 # 接收 LINE 的資訊
@@ -202,6 +248,8 @@ def handle_message(event):
         elif info["platform"] == "momo":
             print("Search on MOMO")
             message = momo(info["search_name"])
+        elif info["platform"] == "shopee":
+            message = shopee(info["search_name"])
         with open("search_info.json", "w") as file:
                 json.dump(info, file)
     elif text.isdigit() == True:
@@ -211,6 +259,8 @@ def handle_message(event):
             message = pchome(info["search_name"], int(text))
         elif info["platform"] == "momo":
             message = momo(info["search_name"], int(text))
+        elif info["platform"] == "shopee":
+            message = shopee(info["search_name"], int(text))
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
 
 if __name__ == "__main__":
