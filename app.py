@@ -109,6 +109,7 @@ class PchomeSpider():
 def pchome(name, page = 1):
     try:
         with open("pchome_porducts_info.json") as file:
+            print("存在商品搜尋紀錄")
             products = json.load(file)
     except:
         products = []
@@ -117,6 +118,7 @@ def pchome(name, page = 1):
     elif len(products) < page * limit:
         products = PchomeSpider().search_products(name, (page*limit)//len(products)+1)
     message = ""
+    print("len(products):", len(products))
     for i in range(limit*(page-1), limit*page):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
@@ -148,13 +150,14 @@ def momo_search(keyword, pages = 1):
     for i, url in enumerate(urls):
         resp = requests.get(url, headers=headers)
         soup = BeautifulSoup(resp.text, features="html.parser")
+        name = soup.find('meta',{'property':'og:title'})['content']
         try:
             price = soup.find('meta',{'property':'product:price:amount'})['content']
         except:
             price = re.sub(r'\r\n| ','',soup.find('del').text)
         products.append({
             "link": url, 
-            "name": soup.find('meta',{'property':'og:title'})['content'], 
+            "name": name, 
             "price": price
             })
     with open("products_info_momo.json", "w") as file:
