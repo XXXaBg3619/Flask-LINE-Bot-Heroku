@@ -102,8 +102,6 @@ class PchomeSpider():
             products.extend(data['prods'])
             if data['totalPage'] <= params['page']:
                 break
-        with open("pchome_porducts_info.json", "w") as file:
-            json.dump(products, file)
         return products
 
 def pchome(name, page = 1):
@@ -113,11 +111,13 @@ def pchome(name, page = 1):
             products = json.load(file)
     except:
         products = []
-    if page == 1 or products == []:
+    if page == 1:
         products = PchomeSpider().search_products(name)
     elif len(products) < page * limit:
         print("爬出下20比商品資訊")
         products += PchomeSpider().search_products(name, (page*limit)//len(products)+1)
+    with open("pchome_porducts_info.json", "w") as file:
+        json.dump(products, file)
     message = ""
     print("len(products):", len(products))
     for i in range(limit*(page-1), limit*page):
