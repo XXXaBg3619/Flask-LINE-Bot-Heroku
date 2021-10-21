@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, with_statement
-import json, requests, re, urllib, contextlib, time
+import json, requests, re, urllib, contextlib
 from urllib.parse import urlencode
 from urllib.request import urlopen
+from emoji import UNICODE_EMOJI
 from bs4 import BeautifulSoup
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -21,6 +22,11 @@ def make_tiny(url):
     request_url = "http://tinyurl.com/api-create.php?" + urlencode({"url": url})
     with contextlib.closing(urlopen(request_url)) as response:
         return response.read().decode("utf-8")
+def isEmoji(content):
+    for emoji in UNICODE_EMOJI['en']:
+        if content.count(emoji) > 0:
+            return True
+    return False
 
 
 # PChome線上購物 爬蟲
@@ -195,7 +201,10 @@ def shopee_search(name, page = 1):
     for item in data["items"]:
         title = item["name"]
         shopid, itemid = item["shopid"], item["itemid"]
-        link = make_tiny(f"https://shopee.tw/{title}-i.{shopid}.{itemid}")
+        if isEmoji(title) == True:
+            link = make_tiny(f"https://shopee.tw/{title}-i.{shopid}.{itemid}")
+        else:
+            link = f"https://shopee.tw/{title}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
             price = str(int(item["price"]) // 100000)
@@ -248,7 +257,6 @@ def handle_message(event):
     message = ""
     text = event.message.text
     info = {}
-    start = time.time()
     if ";" in text:
         info["search_name"], info["platform"] = text.split(";")
         print("info:", info)
@@ -272,8 +280,6 @@ def handle_message(event):
         elif info["platform"] == "shopee":
             message = shopee(info["search_name"], int(text))
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
-    end = time.time()
-    print("time:", end - start, "s")
 
 if __name__ == "__main__":
     app.run()
