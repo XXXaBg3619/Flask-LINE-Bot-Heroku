@@ -114,8 +114,8 @@ def pchome(name, page = 1):
     if page == 1:
         products = PchomeSpider().search_products(name)
     elif len(products) < page * limit:
-        print("爬出下20比商品資訊", (page*limit)//len(products)+1)
-        products = PchomeSpider().search_products(name, (page*limit)//len(products)+1)
+        print("爬出下20筆商品資訊")
+        products = PchomeSpider().search_products(name, (page*limit)//20+1)
     with open("pchome_porducts_info.json", "w") as file:
         json.dump(products, file)
     message = ""
