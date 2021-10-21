@@ -204,7 +204,8 @@ def shopee_search(name, page = 1):
         if isEmoji(title) == True:
             link = make_tiny(f"https://shopee.tw/{title}-i.{shopid}.{itemid}")
         else:
-            link = f"https://shopee.tw/{title}-i.{shopid}.{itemid}"
+            title_fix = title.replace(" ", "-")
+            link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
             price = str(int(item["price"]) // 100000)
