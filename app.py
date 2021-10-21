@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, with_statement
-import json, requests, re, urllib, contextlib
+import json, requests, re, urllib, contextlib, time
 from urllib.parse import urlencode
 from urllib.request import urlopen
 from emoji import UNICODE_EMOJI
@@ -113,10 +113,8 @@ def pchome(name, page = 1):
     except:
         products = []
     if page == 1 or products == []:
-        print("搜尋商品時")
         products = PchomeSpider().search_products(name)
     elif len(products) < page * limit:
-        print("查找頁數(未爬下來)")
         products = PchomeSpider().search_products(name, (page*limit)//len(products)+1)
     message = ""
     for i in range(limit*(page-1), limit*page):
@@ -167,10 +165,8 @@ def momo(name, pages = 1):
     try:
         with open("products_info_momo.json") as file:
             products = json.load(file)
-        print("已有商品資訊")
     except:
         products = []
-        print("未有商品資訊")
     if pages == 1:
         products = momo_search(name)
     else:
@@ -218,10 +214,8 @@ def shopee(name, page = 1):
     try:
         with open("products_info_shopee.json") as file:
             products = json.load(file)
-        print("已有商品資訊")
     except:
         products = []
-        print("未有商品資訊")
     if page == 1:
         products = shopee_search(name)
     else:
@@ -255,6 +249,7 @@ def callback():
 # 搜尋商品
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    start = time.time()
     message = ""
     text = event.message.text
     info = {}
@@ -281,6 +276,8 @@ def handle_message(event):
         elif info["platform"] == "shopee":
             message = shopee(info["search_name"], int(text))
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
+    end = time.time()
+    print("time:", end - start, "s")
 
 if __name__ == "__main__":
     app.run()
