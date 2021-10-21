@@ -90,7 +90,7 @@ class PchomeSpider():
         if is_ipost_pickup:
             params['ipost'] = 'Y'   # i 郵箱取貨
 
-        while params['page'] <= max_page:
+        while params['page'] < max_page:
             params['page'] += 1
             data = self.request_get(url, params)
             if not data:
@@ -114,7 +114,7 @@ def pchome(name, page = 1):
     if page == 1:
         products = PchomeSpider().search_products(name)
     elif len(products) < page * limit:
-        print("爬出下20比商品資訊")
+        print("爬出下20比商品資訊", (page*limit)//len(products)+1)
         products = PchomeSpider().search_products(name, (page*limit)//len(products)+1)
     with open("pchome_porducts_info.json", "w") as file:
         json.dump(products, file)
