@@ -116,7 +116,8 @@ def pchome(name, page = 1):
     if page == 1 or products == []:
         products = PchomeSpider().search_products(name)
     elif len(products) < page * limit:
-        products = PchomeSpider().search_products(name, (page*limit)//len(products)+1)
+        print("爬出下20比商品資訊")
+        products += PchomeSpider().search_products(name, (page*limit)//len(products)+1)
     message = ""
     print("len(products):", len(products))
     for i in range(limit*(page-1), limit*page):
