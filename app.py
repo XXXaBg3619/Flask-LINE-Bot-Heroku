@@ -101,7 +101,7 @@ def pchome(id, name, page = 1):
 # MOMO線上購物 爬蟲
 def momo_search(name, page = 1, Type = 1):
     name_enc = urllib.parse.quote(name)
-    url = f"https://m.momoshop.com.tw/search.momo?searchKeyword={name_enc}&searchType={Type}&cateLevel=-1&curPage={pages}&maxPage=16.html"
+    url = f"https://m.momoshop.com.tw/search.momo?searchKeyword={name_enc}&searchType={Type}&cateLevel=-1&curPage={page}&maxPage=16.html"
     headers = {'User-Agent': 'mozilla/5.0 (Linux; Android 6.0.1; '
                              'Nexus 5x build/mtc19t applewebkit/537.36 (KHTML, like Gecko) '
                              'Chrome/51.0.2702.81 Mobile Safari/537.36'}
