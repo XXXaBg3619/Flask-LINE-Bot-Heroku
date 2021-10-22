@@ -18,7 +18,7 @@ id_developer = "U1e38384f12f22c77281ec3e8611025c8"
 
 
 limit = 5    # 每次傳送之商品數上限
-Help = """【搜尋功能】
+Help = """【【搜尋功能】
 若想在 pchome/momo/shopee 搜尋商品
 請輸入：  商品名稱;平台 
 (英文請輸入半型)
@@ -31,12 +31,11 @@ Ex:  PS5;pchome 、 滑鼠；MOMO
 Ex:  PS5;price 、 滑鼠；Price
 要看下一頁則輸入2 3 4 5.... (請不要向後跳頁)
 *目前只能從最低價開始排*
-*只有pchome/shopee的商品*
 
 【注意】
 pchome回傳時間約1~3秒
 shopee回傳時間約3~5秒
-momo回傳時間約10~15秒 Σ(=ω= ;)
+momo回傳時間約1~3秒
 price回傳時間約3~5秒
 
 若是需要查詢使用方式則輸入help即可
@@ -63,82 +62,16 @@ def isEmoji(content):
 
 
 # PChome線上購物 爬蟲
-class PchomeSpider():
-    def __init__(self):
-        self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36'}
-
-    # 送出 GET 請求
-    def request_get(self, url, params=None, to_json=True):
-        # param url: 請求網址
-        # param params: 傳遞參數資料
-        # param to_json: 是否要轉為 JSON 格式
-        # return data: requests 回應資料
-        r = requests.get(url, params)
-        print(r.url)
-        if r.status_code != requests.codes.ok:
-            print(f'網頁載入發生問題：{url}')
-        try:
-            if to_json:
-                data = r.json()
-            else:
-                data = r.text
-        except Exception as e:
-            print(e)
-            return None
-        return data
-
-    # 搜尋商品
-    def search_products(self, keyword, max_page=1, shop='全部', sort='有貨優先', price_min=-1, price_max=-1, is_store_pickup=False, is_ipost_pickup=False):
-        # param keyword: 搜尋關鍵字
-        # param max_page: 抓取最大頁數
-        # param shop: 賣場類別 (全部、24h購物、24h書店、廠商出貨、PChome旅遊)
-        # param sort: 商品排序 (有貨優先、精準度、價錢由高至低、價錢由低至高、新上市)
-        # param price_min: 篩選"最低價" (需與 price_max 同時用)
-        # param price_max: 篩選"最高價" (需與 price_min 同時用)
-        # param is_store_pickup: 篩選"超商取貨"
-        # param is_ipost_pickup: 篩選"i 郵箱取貨"
-        # return products: 搜尋結果商品
-        products = []
-        all_shop = {
-            '全部': 'all',
-            '24h購物': '24h',
-            '24h書店': '24b',
-            '廠商出貨': 'vdr',
-            'PChome旅遊': 'tour',
-        }
-        all_sort = {
-            '有貨優先': 'sale/dc',
-            '精準度': 'rnk/dc',
-            '價錢由高至低': 'prc/dc',
-            '價錢由低至高': 'prc/ac',
-            '新上市': 'new/dc',
-        }
-
-        url = f'https://ecshweb.pchome.com.tw/search/v3.3/{all_shop[shop]}/results'
-        params = {'q': keyword, 'sort': all_sort[sort], 'page': 0}
-        if price_min >= 0 and price_max >= 0:
-            params['price'] = f'{price_min}-{price_max}'
-        if is_store_pickup:
-            params['cvs'] = 'all'   # 超商取貨
-        if is_ipost_pickup:
-            params['ipost'] = 'Y'   # i 郵箱取貨
-
-        while params['page'] < max_page:
-            params['page'] += 1
-            data = self.request_get(url, params)
-            if not data:
-                print(f'請求發生錯誤：{url}{params}')
-                break
-            if data['totalRows'] <= 0:
-                print('找不到有關的產品')
-                break
-            products.extend(data['prods'])
-            if data['totalPage'] <= params['page']:
-                break
-        for i in products:
-            i["link"] = "https://24h.pchome.com.tw/prod/" + i["Id"]
-            i["price_avg"] = i["price"]
-        return products
+def pchome_search(keyword, page=1, sort='有貨優先'):
+    all_sort = {'有貨優先': 'sale/dc', '價錢由高至低': 'prc/dc', '價錢由低至高': 'prc/ac'}
+    name_enc = urllib.parse.quote(keyword) 
+    url = f"https://ecshweb.pchome.com.tw/search/v3.3/all/results?q={name_enc}&page={page}&sort={all_sort[sort]}"
+    data = json.loads(requests.get(url).text)
+    products = data['prods']
+    for i in products:
+        i["link"] = "https://24h.pchome.com.tw/prod/" + i["Id"]
+        i["price_avg"] = i["price"]
+    return products
 
 def pchome(id, name, page = 1):
     try:
@@ -153,9 +86,9 @@ def pchome(id, name, page = 1):
         products = []
         products_info = {id: products}
     if page == 1 and products == []:
-        products = PchomeSpider().search_products(name)
+        products = pchome_search(name)
     elif len(products) < page * limit:
-        products = PchomeSpider().search_products(name, (page*limit)//20+1)
+        products += pchome_search(name, (page*limit)//20+1)
     with open("pchome_porducts_info.json", "w") as file:
         json.dump(products_info, file)
     message = ""
@@ -167,13 +100,13 @@ def pchome(id, name, page = 1):
     return message
 
 # MOMO線上購物 爬蟲
-def momo_search(name, page = 1):
+def momo_search(name, page = 1, Type = 1):
     name_enc = urllib.parse.quote(name)
     if (page*limit) % 20 != 0:
         pages = (page*limit) // 20 + 1
     else:
         pages = (page*limit) // 20
-    url = f"https://m.momoshop.com.tw/search.momo?searchKeyword={name_enc}&searchType=1&cateLevel=-1&curPage={pages}&maxPage=16.html"
+    url = f"https://m.momoshop.com.tw/search.momo?searchKeyword={name_enc}&searchType={Type}&cateLevel=-1&curPage={pages}&maxPage=16.html"
     headers = {'User-Agent': 'mozilla/5.0 (Linux; Android 6.0.1; '
                              'Nexus 5x build/mtc19t applewebkit/537.36 (KHTML, like Gecko) '
                              'Chrome/51.0.2702.81 Mobile Safari/537.36'}
@@ -192,7 +125,8 @@ def momo_search(name, page = 1):
         products.append({
             'link': item_url,
             'name': item_name,
-            'price': item_price
+            'price': item_price,
+            'price_avg': item_price
         })
     return products
     
@@ -231,9 +165,10 @@ def shopee_search(name, page = 1, order = "desc"):
         'referer': f'https://shopee.tw/search?keyword={urllib.parse.quote(name)}'
     }
     if order == "desc":
-        url = f'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={name}&limit=20&newest={50*(page-1)}&order=desc&page_type=search&version=2'
+        new = 50
     elif order == "asc":
-        url = f'https://shopee.tw/api/v2/search_items/?by=price&keyword={name}&limit=20&newest={20*(page-1)}&order=asc&page_type=search&version=2'
+        new = 20
+    url = f'https://shopee.tw/api/v2/search_items/?by=price&keyword={name}&limit=20&newest={new*(page-1)}&order={order}&page_type=search&version=2'
     resq = requests.Session().get(url, headers=headers)
     if resq.status_code == requests.codes.ok:
         data = resq.json()
@@ -307,12 +242,13 @@ def price(id, name, page = 1):
         products = []
         products_info = {id: products}
     if page == 1 and products == []:
-        products = PchomeSpider().search_products(name, sort = "價錢由低至高")
+        products = pchome_search(name, sort = "價錢由低至高")
+        products += momo_search(name, Type = 2)
         products += shopee_search(name, order = "asc")
     elif len(products) < page * limit:
-        print("len:", len(products))
         pages = page // (20 // limit) + 1
-        products = PchomeSpider().search_products(name, pages, sort = "價錢由低至高")
+        products += pchome_search(name, pages, sort = "價錢由低至高")
+        products += momo_search(name, pages, Type = 2)
         products += shopee_search(name, pages, "asc")
     products = sorted(products, key = lambda d: d["price_avg"]) 
     with open("products_info_price.json", "w") as file:
