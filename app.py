@@ -18,18 +18,20 @@ id_developer = "U1e38384f12f22c77281ec3e8611025c8"
 
 
 limit = 5    # 每次傳送之商品數上限
-Help = """搜尋功能】
+Help = """【搜尋功能】
 若想在 pchome/momo/shopee 搜尋商品
-請輸入：  商品名稱;平台 (英文請輸入半型)
+請輸入：  商品名稱;平台 
+(英文請輸入半型)
 Ex:  PS5;pchome 、 滑鼠；MOMO
 要看下一頁則輸入2 3 4 5.... (請不要向後跳頁)
 
 【比價功能】
-請輸入： 商品名稱:price  (英文請輸入半型)
+請輸入： 商品名稱;price  
+(英文請輸入半型)
 Ex:  PS5;price 、 滑鼠；Price
 要看下一頁則輸入2 3 4 5.... (請不要向後跳頁)
-＊目前只能從最低價開始排＊
-＊只有pchome/shopee的商品＊
+*目前只能從最低價開始排*
+*只有pchome/shopee的商品*
 
 【注意】
 pchome回傳時間約1~3秒
@@ -333,7 +335,6 @@ def price(id, name, page = 1):
     
 
 def search(id, info, page = 1):
-    info["platform"] = info["platform"].lower().rstrip().strip()
     if len(info["platform"]) >= 6:
         info["platform"] = info["platform"][:6]
     if info["platform"] == "pchome":
@@ -365,7 +366,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     start = time.time()
-    text = event.message.text
+    text = event.message.text.lower().rstrip().strip()
     id = event.source.user_id
     try:
         with open("search_info.json") as file:
@@ -378,7 +379,7 @@ def handle_message(event):
     except:
         info_id = {}
         info = {"mode_off": False, id: info_id}
-    if text.lower().rstrip().strip() == "help":
+    if text == "help":
         message = Help
     elif info["mode_off"] and id != id_developer:
         message = mode_off
