@@ -120,7 +120,7 @@ class PchomeSpider():
                 break
         for i in products:
             i["link"] = "https://24h.pchome.com.tw/prod/" + i["Id"]
-        print("type:", type(products))
+            i["price_avg"] = i["price"]
         return products
 
 def pchome(id, name, page = 1):
@@ -242,7 +242,7 @@ def shopee_search(name, page = 1, order = "desc"):
                     link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
                     tiny = True
                     break
-            tiny = False
+                tiny = False
         if not tiny:
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
