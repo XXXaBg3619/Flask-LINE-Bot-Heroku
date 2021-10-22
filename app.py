@@ -92,6 +92,7 @@ def pchome(id, name, page = 1):
     if page == 1 and products == []:
         products = pchome_search(name)
     elif len(products) < page * limit:
+        print("check point")
         products += pchome_search(name, pages)
     with open("pchome_porducts_info.json", "w") as file:
         json.dump(products_info, file)
