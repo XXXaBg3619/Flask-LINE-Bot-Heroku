@@ -77,6 +77,7 @@ def pchome(id, name, page = 1):
     try:
         with open("products_info_pchome.json") as file:
             products_info = json.load(file)
+            print("1-0")
             try:
                 products = products_info[id]
                 print("1-1")
