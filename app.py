@@ -18,6 +18,7 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 limit = 5    # 每次傳送之商品數上限
 
+
 def make_tiny(url):
     request_url = "http://tinyurl.com/api-create.php?" + urlencode({"url": url})
     with contextlib.closing(urlopen(request_url)) as response:
@@ -27,6 +28,21 @@ def isEmoji(content):
         if content.count(emoji) > 0:
             return True
     return False
+def Append(s):
+    for i in s:
+        b = []
+        for j in s[i]:
+            a = s[i][j]
+            b += [f" {a}", f"{a} ", f" {a} "]
+        s[i][j] += b
+    return s
+
+store_name = {
+        "pchome": ["pchome", "Pchome", "PChome24h"],
+        "momo": ["momo", "Momo", "MOMO"],
+        "shopee": ["shopee", "Shopee"]
+    }
+store_name = Append(store_name)
 
 
 # PChome線上購物 爬蟲
@@ -203,7 +219,15 @@ def shopee_search(name, page = 1):
         shopid, itemid = item["shopid"], item["itemid"]
         if isEmoji(title) == True:
             link = make_tiny(f"https://shopee.tw/{title}-i.{shopid}.{itemid}")
+            make_tiny = True
         else:
+            for i in ("[", "]", "<", ">"):
+                if i in title:
+                    link = make_tiny(f"https://shopee.tw/{title}-i.{shopid}.{itemid}")
+                    make_tiny = True
+                    break
+                make_tiny = False
+        if not make_tiny:
             title_fix = title.replace(" ", "-")
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
@@ -260,13 +284,13 @@ def handle_message(event):
     if ";" in text:
         info["search_name"], info["platform"] = text.split(";")
         print("info:", info)
-        if info["platform"] == "pchome":
+        if info["platform"] in store_name["pchome"]:
             print("Search on PChome")
             message = pchome(info["search_name"])
-        elif info["platform"] == "momo":
+        elif info["platform"] in store_name["momo"]:
             print("Search on MOMO")
             message = momo(info["search_name"])
-        elif info["platform"] == "shopee":
+        elif info["platform"] in store_name["shopee"]:
             message = shopee(info["search_name"])
         with open("search_info.json", "w") as file:
                 json.dump(info, file)
