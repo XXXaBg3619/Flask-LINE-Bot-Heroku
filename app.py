@@ -275,7 +275,7 @@ def shopee(id, name, page = 1):
     for i in range(limit*(page-1), limit*page):
         message += products[i]["link"] + "\n"
         message += products[i]["name"] + "\n"
-        message += "$" + products[i]["price"] + "\n"
+        message += "$" + str(products[i]["price"]) + "\n"
     message += " " * 20 + f"[第{page}頁]"
     return message
 
@@ -321,10 +321,10 @@ def search(id, info, page = 1):
     if info["platform"] == "pchome":
         print("Search on PChome")
         return pchome(id, info["search_name"], page)
-    elif info["platform"] in ("momo", "蝦皮"):
+    elif info["platform"] == "momo":
         print("Search on MOMO")
         return momo(id, info["search_name"], page)
-    elif info["platform"] == "shopee":
+    elif info["platform"] in ("shopee", "蝦皮"):
         return shopee(id, info["search_name"], page)
     elif info["platform"] == "price":
         return price(id, info["search_name"], page)
