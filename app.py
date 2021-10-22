@@ -120,6 +120,7 @@ class PchomeSpider():
                 break
         for i in products:
             i["link"] = "https://24h.pchome.com.tw/prod/" + i["Id"]
+        print("type:", type(products))
         return products
 
 def pchome(id, name, page = 1):
@@ -129,10 +130,10 @@ def pchome(id, name, page = 1):
             try:
                 products = products_info[id]
             except:
-                products = {}
+                products = []
                 products_info[id] = products
     except:
-        products = {}
+        products = []
         products_info = {id: products}
     if page == 1:
         products = PchomeSpider().search_products(name)
@@ -193,10 +194,10 @@ def momo(id, name, pages = 1):
             try:
                 products = products_info[id]
             except:
-                products = {}
+                products = []
                 products_info[id] = products
     except:
-        products = {}
+        products = []
         products_info = {id: products}
     if pages == 1:
         products = momo_search(name)
@@ -258,10 +259,10 @@ def shopee(id, name, page = 1):
             try:
                 products = products_info[id]
             except:
-                products = {}
+                products = []
                 products_info[id] = products
     except:
-        products = {}
+        products = []
         products_info = {id: products}
     if page == 1:
         products = shopee_search(name)
@@ -286,15 +287,16 @@ def price(id, name, page = 1):
             try:
                 products = products_info[id]
             except:
-                products = {}
+                products = []
                 products_info[id] = products
     except:
-        products = {}
+        products = []
         products_info = {id: products}
     if page == 1:
         products = PchomeSpider().search_products(name, sort = "價錢由低至高")
         products += shopee_search(name, order = "asc")
     elif len(products) < page * limit:
+        print("len:", len(products))
         pages_pchome = page // (20 // limit) + 1
         pages_shopee = page // (50 // limit) + 1
         products += PchomeSpider().search_products(name, pages_pchome, sort = "價錢由低至高")
