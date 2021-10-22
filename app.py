@@ -276,7 +276,11 @@ def shopee(name, page = 1):
     
 
 def search(info, page):
-    info["search_name"] = info["search_name"].lower().rstrip().strip()[:6]
+    info["search_name"] = info["search_name"].lower().rstrip().strip()
+    if len(info["search_name"]) >= 6:
+        info["search_name"] = info["search_name"][:6]
+    elif 4 <= len(info["search_name"]) <= 6:
+        info["search_name"] = info["search_name"][:4]
     if info["platform"] == "pchome":
         print("Search on PChome")
         return pchome(info["search_name"], page)
@@ -287,6 +291,11 @@ def search(info, page):
         return shopee(info["search_name"], page)
     # elif info["platform"] in store_name["price"]:
     #     message = price(info["search_name"], page)
+    else:
+        return """
+        無法搜尋到商品
+        請確認商品名稱或平台名稱是否有誤～
+        """
 
 
 
