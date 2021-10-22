@@ -28,22 +28,6 @@ def isEmoji(content):
         if content.count(emoji) > 0:
             return True
     return False
-def Append(s):
-    for i in s:
-        b = []
-        for j in s[i]:
-            a = j
-            b += [f" {a}", f"{a} ", f" {a} "]
-        s[i] += b
-    return s
-
-store_name = {
-        "pchome": ["pchome", "Pchome", "PChome", "PChome24h"],
-        "momo": ["momo", "Momo", "MOMO"],
-        "shopee": ["shopee", "Shopee"],
-        "price": ["price", "Price"]
-    }
-store_name = Append(store_name)
 
 
 # PChome線上購物 爬蟲
@@ -278,13 +262,14 @@ def shopee(name, page = 1):
     
 
 def search(info, page):
-    if info["platform"] in store_name["pchome"]:
+    info["search_name"] = info["search_name"].lower().rstrip().strip()[:6]
+    if info["platform"] == "pchome":
         print("Search on PChome")
         return pchome(info["search_name"], page)
-    elif info["platform"] in store_name["momo"]:
+    elif info["platform"] == "momo":
         print("Search on MOMO")
         return momo(info["search_name"], page)
-    elif info["platform"] in store_name["shopee"]:
+    elif info["platform"] == "shopee":
         return shopee(info["search_name"], page)
     # elif info["platform"] in store_name["price"]:
     #     message = price(info["search_name"], page)
