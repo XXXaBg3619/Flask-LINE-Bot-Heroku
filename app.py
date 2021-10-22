@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 line_bot_api = LineBotApi("S1NRUscHr3pXdpnYh28UZlZmeEnmEbfX6rkSC3WHo/zSbBxUJcKgLEGtOoTlaHB7ntc/QBgAKFcwDuEvM5Kmtwhph1DdYBOeCcVB+N7Cnt9KRyrjdR6vA/+KONhX/VBvK+fqUq6yFpxsahuV3YRPQAdB04t89/1O/w1cDnyilFU=")
 handler = WebhookHandler("e104139d44baead65940861cbf50b707")
-id_developer = "Ud88738728f539076c18e761ae8ce06cd"
+id_developer = "U1e38384f12f22c77281ec3e8611025c8"
 
 
 limit = 5    # 每次傳送之商品數上限
@@ -387,9 +387,6 @@ def handle_message(event):
         info["mode_off"] = False
         print("mode on")
         message = "mode on"
-    else:
-        print(id)
-        message = id
     with open("search_info.json", "w") as file:
         json.dump(info, file)
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
