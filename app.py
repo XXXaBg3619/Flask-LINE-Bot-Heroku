@@ -79,12 +79,15 @@ def pchome(id, name, page = 1):
             products_info = json.load(file)
             try:
                 products = products_info[id]
+                print("1-1")
             except:
                 products = []
                 products_info[id] = products
+                print("1-2")
     except:
         products = []
         products_info = {id: products}
+        print("1-3")
     if (page*limit) % 20 != 0:
         pages = (page*limit) // 20 + 1
     else:
@@ -325,7 +328,7 @@ def handle_message(event):
                 info[id] = info_id
     except:
         info_id = {}
-        info = {"mode_off": False, id: info_id}
+        info = {"mode_off": True, id: info_id}
     if text == "help":
         message = Help
     elif info["mode_off"] and id != id_developer:
