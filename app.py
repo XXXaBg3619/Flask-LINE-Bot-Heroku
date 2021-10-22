@@ -313,9 +313,9 @@ def callback():
 def handle_message(event):
     start = time.time()
     text = event.message.text
-    print(type(event))
-    print(event)
-    id = event["source"]["userId"]
+    # print(type(event))
+    # print(event)
+    id = line_bot_api.get_profile('<user_id>')
     try:
         with open("search_info.json") as file:
             info = json.load(file)
