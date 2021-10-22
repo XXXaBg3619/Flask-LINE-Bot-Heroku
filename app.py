@@ -116,6 +116,7 @@ class PchomeSpider():
                 print('找不到有關的產品')
                 break
             products.extend(data['prods'])
+            products[-1]["link"] = "https://24h.pchome.com.tw/prod/" + products[-1]["Id"]
             if data['totalPage'] <= params['page']:
                 break
         return products
@@ -140,7 +141,7 @@ def pchome(id, name, page = 1):
         json.dump(products_info, file)
     message = ""
     for i in range(limit*(page-1), limit*page):
-        message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
+        message += products[i]["link"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
     message += " " * 20 + f"[第{page}頁]"
