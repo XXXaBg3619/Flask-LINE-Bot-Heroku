@@ -17,6 +17,20 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 limit = 5    # 每次傳送之商品數上限
+Help = """
+若想在 pchome/momo/shopee 搜尋商品
+請傳：  商品名稱;平台 (大小寫、全半型皆可)
+ex:  PS5;pchome 、 滑鼠；MOMO
+要看下一頁則輸入2 3 4 5.... (請不要跳頁)
+
+*注意*
+pchome回傳時間約1~3秒
+shopee回傳時間約3~5秒
+momo回傳時間約10~15秒 (可悲慢
+
+若是需要查詢使用方式則輸入help即可
+祝泥使用愉快～
+"""
 
 
 def make_tiny(url):
@@ -292,7 +306,6 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     start = time.time()
-    message = ""
     text = event.message.text
     info = {}
     if ";" in text:
@@ -300,18 +313,23 @@ def handle_message(event):
         print("info:", info)
         page = 1
         with open("search_info.json", "w") as file:
-                json.dump(info, file)
+            json.dump(info, file)
+        message = search(info, page)
     elif "；" in text:
         info["search_name"], info["platform"] = text.split("；")
         print("info:", info)
         page = 1
         with open("search_info.json", "w") as file:
-                json.dump(info, file)
+            json.dump(info, file)
+        message = search(info, page)
     elif text.isdigit() == True:
+        page = int(text)
         with open("search_info.json") as file:
             info = json.load(file)
-        page = int(text)
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text = search(info, page)))
+        message = search(info, page)
+    elif text.lower().rstrip().strip()[:4] == "help":
+        message = Help
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     end = time.time()
     print("time:", end - start, "s")
 
