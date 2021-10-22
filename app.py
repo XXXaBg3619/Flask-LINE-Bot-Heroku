@@ -17,8 +17,7 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 limit = 5    # 每次傳送之商品數上限
-Help = """
-若想在 pchome/momo/shopee 搜尋商品
+Help = """若想在 pchome/momo/shopee 搜尋商品
 請傳：  商品名稱;平台 (大小寫、全半型皆可)
 ex:  PS5;pchome 、 滑鼠；MOMO
 要看下一頁則輸入2 3 4 5.... (請不要跳頁)
@@ -29,8 +28,7 @@ shopee回傳時間約3~5秒
 momo回傳時間約10~15秒 (可悲慢
 
 若是需要查詢使用方式則輸入help即可
-祝泥使用愉快～
-"""
+祝泥使用愉快～"""
 
 
 def make_tiny(url):
@@ -276,11 +274,11 @@ def shopee(name, page = 1):
     
 
 def search(info, page):
-    info["search_name"] = info["search_name"].lower().rstrip().strip()
-    if len(info["search_name"]) >= 6:
-        info["search_name"] = info["search_name"][:6]
-    elif 4 <= len(info["search_name"]) <= 6:
-        info["search_name"] = info["search_name"][:4]
+    info["platform"] = info["platform"].lower().rstrip().strip()
+    if len(info["platform"]) >= 6:
+        info["platform"] = info["platform"][:6]
+    elif 4 <= len(info["platform"]) <= 6:
+        info["platform"] = info["platform"][:4]
     if info["platform"] == "pchome":
         print("Search on PChome")
         return pchome(info["search_name"], page)
@@ -292,10 +290,8 @@ def search(info, page):
     # elif info["platform"] in store_name["price"]:
     #     message = price(info["search_name"], page)
     else:
-        return """
-        無法搜尋到商品
-        請確認商品名稱或平台名稱是否有誤～
-        """
+        return """無法搜尋到商品
+        請確認商品名稱或平台名稱是否有誤～"""
 
 
 
