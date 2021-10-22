@@ -328,7 +328,10 @@ def price(id, name, page = 1):
     message = ""
     for i in range(limit*(page-1), limit*page):
         message += products[i]["link"] + "\n"
-        message += products[i]["name"] + "\n"
+        if "pchome" in products[i]["link"]:
+            message += "〈PChome〉" + products[i]["name"] + "\n"
+        else:
+            message += "〈Shopee〉" + products[i]["name"] + "\n"
         message += "$" + str(products[i]["price"]) + "\n"
     message += " " * 20 + f"[第{page}頁]"
     return message
