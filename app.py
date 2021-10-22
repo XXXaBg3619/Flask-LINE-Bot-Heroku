@@ -368,7 +368,7 @@ def handle_message(event):
     except:
         info_id = {}
         info = {"mode_off": False, id: info_id}
-    if info["mode_off"]:
+    if info["mode_off"] and id != id_developer:
         message = mode_off
     elif ";" in text:
         info_id["search_name"], info_id["platform"] = text.split(";")
@@ -380,11 +380,11 @@ def handle_message(event):
         message = search(id, info_id, int(text))
     elif text.lower().rstrip().strip()[:4] == "help":
         message = Help
-    elif text == "mode:off" and id == id_developer:
+    elif text == "mode off" and id == id_developer:
         info["mode_off"] = True
         print("mode off")
         message = "mode off"
-    elif text == "mode:on" and id == id_developer:
+    elif text == "mode on" and id == id_developer:
         info["mode_off"] = False
         print("mode on")
         message = "mode on"
