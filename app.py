@@ -318,8 +318,6 @@ def search(id, info, page = 1):
     info["platform"] = info["platform"].lower().rstrip().strip()
     if len(info["platform"]) >= 6:
         info["platform"] = info["platform"][:6]
-    elif 4 <= len(info["platform"]) <= 6:
-        info["platform"] = info["platform"][:4]
     print("info:", info)
     if info["platform"] == "pchome":
         print("Search on PChome")
@@ -329,8 +327,8 @@ def search(id, info, page = 1):
         return momo(id, info["search_name"], page)
     elif info["platform"] == "shopee":
         return shopee(id, info["search_name"], page)
-    # elif info["platform"] in store_name["price"]:
-    #     message = price(id, info["search_name"], page)
+    elif info["platform"] == "price":
+        message = price(id, info["search_name"], page)
     else:
         return """無法搜尋到商品
         請確認商品名稱或平台名稱是否有誤～"""
