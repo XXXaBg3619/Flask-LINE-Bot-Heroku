@@ -273,16 +273,17 @@ def shopee(name, page = 1):
 #         products += shopee_search(name, pages)
     
 
-def search(info, page):
+def search(info, page = 1):
     info["platform"] = info["platform"].lower().rstrip().strip()
     if len(info["platform"]) >= 6:
         info["platform"] = info["platform"][:6]
     elif 4 <= len(info["platform"]) <= 6:
         info["platform"] = info["platform"][:4]
+    print("info:", info)
     if info["platform"] == "pchome":
         print("Search on PChome")
         return pchome(info["search_name"], page)
-    elif info["platform"] == "momo":
+    elif info["platform"] in ("momo", "蝦皮"):
         print("Search on MOMO")
         return momo(info["search_name"], page)
     elif info["platform"] == "shopee":
@@ -312,28 +313,24 @@ def callback():
 def handle_message(event):
     start = time.time()
     text = event.message.text
-    info = {}
-    if ";" in text:
-        info["search_name"], info["platform"] = text.split(";")
-        print("info:", info)
-        page = 1
-        with open("search_info.json", "w") as file:
-            json.dump(info, file)
-        message = search(info, page)
-    elif "；" in text:
-        info["search_name"], info["platform"] = text.split("；")
-        print("info:", info)
-        page = 1
-        with open("search_info.json", "w") as file:
-            json.dump(info, file)
-        message = search(info, page)
-    elif text.isdigit() == True:
-        page = int(text)
+    id = event.source.userId
+    try:
         with open("search_info.json") as file:
             info = json.load(file)
-        message = search(info, page)
+    except:
+        info = {id: {}}
+    if ";" in text:
+        info[id]["search_name"], info[id]["platform"] = text.split(";")
+        message = search(info[id])
+    elif "；" in text:
+        info[id]["search_name"], info[id]["platform"] = text.split("；")
+        message = search(info[id])
+    elif text.isdigit() == True:
+        message = search(info[id], int(text))
     elif text.lower().rstrip().strip()[:4] == "help":
         message = Help
+    with open("search_info.json", "w") as file:
+        json.dump(info, file)
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     end = time.time()
     print("time:", end - start, "s")
