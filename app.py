@@ -354,8 +354,7 @@ def handle_message(event):
     text = event.message.text
     # print(type(event))
     # print(event)
-    # line_bot_api = LineBotApi('<channel access token>')
-    id = line_bot_api.get_profile('<user_id>')
+    id = event.source.user_id
     try:
         with open("search_info.json") as file:
             info = json.load(file)
