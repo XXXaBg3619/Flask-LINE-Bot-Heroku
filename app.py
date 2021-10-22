@@ -167,41 +167,33 @@ def pchome(id, name, page = 1):
     return message
 
 # MOMO線上購物 爬蟲
-def momo_search(keyword, pages = 1):
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'}
-    urls = []
-    amount = 20 // limit
-    page = pages // amount + 1
-    pages = pages % amount if pages % amount != 0 else 4
-    if pages != 1:
-        with open("urls_momo.json") as file:
-            urls = json.load(file)
+def momo_search(name, page):
+    name_enc = urllib.parse.quote(name)
+    if (page*limit) % 20 != 0:
+        pages = (page*limit) // 20 + 1
     else:
-        url = 'https://m.momoshop.com.tw/search.momo?_advFirst=N&_advCp=N&curPage={}&searchType=1&cateLevel=2&ent=k&searchKeyword={}&_advThreeHours=N&_isFuzzy=0&_imgSH=fourCardType'.format(page, keyword)
-        resp = requests.get(url, headers=headers)
-        if resp.status_code == 200:
-            soup = BeautifulSoup(resp.text, features="html.parser")
-            for item in soup.select('li.goodsItemLi > a'):
-                urls.append('https://m.momoshop.com.tw'+item['href'])
-        with open("urls_momo.json", "w") as file:
-            json.dump(urls, file)
+        pages = (page*limit) // 20
+    url = f"https://m.momoshop.com.tw/search.momo?searchKeyword={name_enc}&searchType=1&cateLevel=-1&curPage={pages}&maxPage=16.html"
+    headers = {'User-Agent': 'mozilla/5.0 (Linux; Android 6.0.1; '
+                             'Nexus 5x build/mtc19t applewebkit/537.36 (KHTML, like Gecko) '
+                             'Chrome/51.0.2702.81 Mobile Safari/537.36'}
+    resp = requests.get(url, headers=headers)
+    if not resp:
+        return []
+    resp.encoding = 'utf-8'
+    soup = BeautifulSoup(resp.text, 'html.parser')
     products = []
-    urls = urls[limit*(pages-1):limit*pages]
-    for i, url in enumerate(urls):
-        resp = requests.get(url, headers=headers)
-        soup = BeautifulSoup(resp.text, features="html.parser")
-        name = soup.find('meta',{'property':'og:title'})['content']
-        try:
-            price = soup.find('meta',{'property':'product:price:amount'})['content']
-        except:
-            price = re.sub(r'\r\n| ','',soup.find('del').text)
+    for elem in soup.find_all("li", "goodsItemLi"):
+        item_url = 'http://m.momoshop.com.tw' + elem.find('a')['href']
+        item_name = elem.find("h3", "prdName").text.strip()
+        item_price = elem.find("b", {"class": "price"}).text.strip()
+        if not item_price:
+            continue
         products.append({
-            "link": url, 
-            "name": name, 
-            "price": price
-            })
-    with open("products_info_momo.json", "w") as file:
-        json.dump(products, file)
+            'link': item_url,
+            'name': item_name,
+            'price': item_price
+        })
     return products
     
 def momo(id, name, pages = 1):
