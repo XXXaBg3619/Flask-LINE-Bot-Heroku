@@ -221,17 +221,16 @@ def shopee_search(name, page = 1):
         title_fix = title.replace(" ", "-")
         if isEmoji(title) == True:
             print("要縮的網址：", f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
-            url_fix = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
-            link = make_tiny(url_fix)
-            make_tiny = True
+            link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
+            tiny = True
         else:
             for i in ("[", "]", "<", ">"):
                 if i in title:
                     link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
-                    make_tiny = True
+                    tiny = True
                     break
-                make_tiny = False
-        if not make_tiny:
+                tiny = False
+        if not tiny:
             print("不用縮的網址：", f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
