@@ -135,7 +135,7 @@ def pchome(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
-    if page == 1:
+    if page == 1 and products == []:
         products = PchomeSpider().search_products(name)
     elif len(products) < page * limit:
         products = PchomeSpider().search_products(name, (page*limit)//20+1)
@@ -199,7 +199,7 @@ def momo(id, name, pages = 1):
     except:
         products = []
         products_info = {id: products}
-    if pages == 1:
+    if pages == 1 and products == []:
         products = momo_search(name)
     else:
         products += momo_search(name, pages)
@@ -264,11 +264,11 @@ def shopee(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
-    if page == 1:
-        products = shopee_search(name)
+    if page == 1 and products == []:
+        products = shopee_search(name, 1, "asc")
     else:
         pages = page // (50 // limit) + 1
-        products += shopee_search(name, pages)
+        products += shopee_search(name, pages, "asc")
     with open("products_info_shopee.json", "w") as file:
         json.dump(products_info, file)
     message = ""
@@ -292,7 +292,7 @@ def price(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
-    if page == 1:
+    if page == 1 and products == []:
         products = PchomeSpider().search_products(name, sort = "價錢由低至高")
         products += shopee_search(name, order = "asc")
     elif len(products) < page * limit:
@@ -301,8 +301,6 @@ def price(id, name, page = 1):
         pages_shopee = page // (50 // limit) + 1
         products += PchomeSpider().search_products(name, pages_pchome, sort = "價錢由低至高")
         products += shopee_search(name, pages_shopee, "asc")
-    for i in products:
-        print(i["price"])
     products = sorted(products, key = lambda d: d["price"]) 
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
