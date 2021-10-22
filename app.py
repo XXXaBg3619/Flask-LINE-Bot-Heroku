@@ -135,12 +135,10 @@ def pchome(id, name, page = 1):
     if page == 1:
         products = PchomeSpider().search_products(name)
     elif len(products) < page * limit:
-        print("爬出下20筆商品資訊")
         products = PchomeSpider().search_products(name, (page*limit)//20+1)
     with open("pchome_porducts_info.json", "w") as file:
         json.dump(products_info, file)
     message = ""
-    print("len(products):", len(products))
     for i in range(limit*(page-1), limit*page):
         message += "https://24h.pchome.com.tw/prod/" + products[i]["Id"] + "\n"
         message += products[i]["name"] + "\n"
@@ -243,7 +241,7 @@ def shopee_search(name, page = 1, order = "desc"):
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if order == "asc":
-            price = round((price_max+price_min)/2) if "~" in price else int(item["price"]//100000)
+            price = round((price_max+price_min)/2) if "~" in price_min != price_max else int(item["price"]//100000)
         elif price_min == price_max:
             price = str(int(item["price"] // 100000))
         else:
