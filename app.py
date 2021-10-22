@@ -167,7 +167,7 @@ def pchome(id, name, page = 1):
     return message
 
 # MOMO線上購物 爬蟲
-def momo_search(name, page):
+def momo_search(name, page = 1):
     name_enc = urllib.parse.quote(name)
     if (page*limit) % 20 != 0:
         pages = (page*limit) // 20 + 1
