@@ -32,9 +32,9 @@ def Append(s):
     for i in s:
         b = []
         for j in s[i]:
-            a = s[i][j]
+            a = j
             b += [f" {a}", f"{a} ", f" {a} "]
-        s[i][j] += b
+        s[i] += b
     return s
 
 store_name = {
