@@ -269,6 +269,8 @@ def shopee(id, name, page = 1):
     else:
         pages = page // (50 // limit) + 1
         products += shopee_search(name, pages, "asc")
+    for i in products:
+        print(i)
     with open("products_info_shopee.json", "w") as file:
         json.dump(products_info, file)
     message = ""
@@ -317,12 +319,9 @@ def search(id, info, page = 1):
     info["platform"] = info["platform"].lower().rstrip().strip()
     if len(info["platform"]) >= 6:
         info["platform"] = info["platform"][:6]
-    print("info:", info)
     if info["platform"] == "pchome":
-        print("Search on PChome")
         return pchome(id, info["search_name"], page)
     elif info["platform"] == "momo":
-        print("Search on MOMO")
         return momo(id, info["search_name"], page)
     elif info["platform"] in ("shopee", "蝦皮"):
         return shopee(id, info["search_name"], page)
