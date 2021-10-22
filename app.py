@@ -14,6 +14,7 @@ app = Flask(__name__)
 
 line_bot_api = LineBotApi("S1NRUscHr3pXdpnYh28UZlZmeEnmEbfX6rkSC3WHo/zSbBxUJcKgLEGtOoTlaHB7ntc/QBgAKFcwDuEvM5Kmtwhph1DdYBOeCcVB+N7Cnt9KRyrjdR6vA/+KONhX/VBvK+fqUq6yFpxsahuV3YRPQAdB04t89/1O/w1cDnyilFU=")
 handler = WebhookHandler("e104139d44baead65940861cbf50b707")
+id_developer = "Ud88738728f539076c18e761ae8ce06cd"
 
 
 limit = 5    # 每次傳送之商品數上限
@@ -29,6 +30,8 @@ momo回傳時間約10~15秒 (可悲慢
 
 若是需要查詢使用方式則輸入help即可
 祝泥使用愉快～"""
+mode_off = """機器人目前測試中
+請稍後再使用"""
 # products_info = {id: products, ...}
 # products = [{"url": url, "name": name, "price": price}, ...]
 
@@ -363,8 +366,10 @@ def handle_message(event):
                 info[id] = info_id
     except:
         info_id = {}
-        info = {id: info_id}
-    if ";" in text:
+        info = {"mode_off": False, id: info_id}
+    if info["mode_off"]:
+        message = mode_off
+    elif ";" in text:
         info_id["search_name"], info_id["platform"] = text.split(";")
         message = search(id, info_id)
     elif "；" in text:
@@ -374,6 +379,10 @@ def handle_message(event):
         message = search(id, info_id, int(text))
     elif text.lower().rstrip().strip()[:4] == "help":
         message = Help
+    elif text == "mode:off" and id == id_developer:
+        info["mode_off"] = True
+    elif text == "mode:on" and id == id_developer:
+        info["mode_off"] = False
     with open("search_info.json", "w") as file:
         json.dump(info, file)
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
