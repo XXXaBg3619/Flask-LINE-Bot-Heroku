@@ -32,6 +32,8 @@ momo回傳時間約10~15秒 (可悲慢
 祝泥使用愉快～"""
 mode_off = """機器人目前測試中
 請稍後再使用"""
+Except = """無法搜尋到商品
+請確認輸入是否有誤～"""
 # products_info = {id: products, ...}
 # products = [{"url": url, "name": name, "price": price}, ...]
 
@@ -333,8 +335,7 @@ def search(id, info, page = 1):
     elif info["platform"] == "price":
         return price(id, info["search_name"], page)
     else:
-        return """無法搜尋到商品
-        請確認商品名稱或平台名稱是否有誤～"""
+        return Except
 
 
 
@@ -367,7 +368,7 @@ def handle_message(event):
     except:
         info_id = {}
         info = {"mode_off": False, id: info_id}
-    if info["mode_off"] and id != id_developer:
+    if info["mode_off"]:
         message = mode_off
     elif ";" in text:
         info_id["search_name"], info_id["platform"] = text.split(";")
@@ -387,6 +388,8 @@ def handle_message(event):
         info["mode_off"] = False
         print("mode on")
         message = "mode on"
+    else:
+        message = Except
     with open("search_info.json", "w") as file:
         json.dump(info, file)
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
