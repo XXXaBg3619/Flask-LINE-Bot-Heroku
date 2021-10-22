@@ -85,13 +85,8 @@ def pchome(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
-    if (page*limit) % 20 != 0:
-        pages = (page*limit) // 20 + 1
-    else:
-        pages = (page*limit) // 20
-    if page == 1 and products == []:
-        products = pchome_search(name)
-    elif len(products) < page * limit:
+    pages = ((page - 1) * limit) // 20 + 1
+    if (page == 1 and products == []) or len(products) < page * limit:
         products += pchome_search(name, pages)
     with open("products_info_pchome.json", "w") as file:
         json.dump(products_info, file)
@@ -106,17 +101,11 @@ def pchome(id, name, page = 1):
 # MOMO線上購物 爬蟲
 def momo_search(name, page = 1, Type = 1):
     name_enc = urllib.parse.quote(name)
-    if (page*limit) % 20 != 0:
-        pages = (page*limit) // 20 + 1
-    else:
-        pages = (page*limit) // 20
     url = f"https://m.momoshop.com.tw/search.momo?searchKeyword={name_enc}&searchType={Type}&cateLevel=-1&curPage={pages}&maxPage=16.html"
     headers = {'User-Agent': 'mozilla/5.0 (Linux; Android 6.0.1; '
                              'Nexus 5x build/mtc19t applewebkit/537.36 (KHTML, like Gecko) '
                              'Chrome/51.0.2702.81 Mobile Safari/537.36'}
     resp = requests.get(url, headers=headers)
-    if not resp:
-        return []
     resp.encoding = 'utf-8'
     soup = BeautifulSoup(resp.text, 'html.parser')
     products = []
@@ -124,14 +113,7 @@ def momo_search(name, page = 1, Type = 1):
         item_url = 'http://m.momoshop.com.tw' + elem.find('a')['href']
         item_name = elem.find("h3", "prdName").text.strip()
         item_price = elem.find("b", {"class": "price"}).text.strip()
-        if not item_price:
-            continue
-        products.append({
-            'link': item_url,
-            'name': item_name,
-            'price': item_price,
-            'price_avg': item_price
-        })
+        products.append({'link': item_url, 'name': item_name, 'price': item_price, 'price_avg': item_price})
     return products
     
 def momo(id, name, page = 1):
@@ -146,14 +128,9 @@ def momo(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
-    if (page*limit) % 20 != 0:
-        pages = (page*limit) // 20 + 1
-    else:
-        pages = (page*limit) // 20
-    if page == 1 and products == []:
-        products = momo_search(name)
-    else:
-        products += momo_search(name, pages)
+    pages = ((page - 1) * limit) // 20 + 1
+    if (page == 1 and products == []) or len(products) < page * limit:
+        products = +momo_search(name, pages)
     with open("products_info_momo.json", "w") as file:
         json.dump(products_info, file)
     message = ""
@@ -220,14 +197,8 @@ def shopee(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
-    if (page*limit) % 50 != 0:
-        pages = (page*limit) // 50 + 1
-    else:
-        pages = (page*limit) // 50
-    if page == 1 and products == []:
-        print("check point")
-        products = shopee_search(name, 1)
-    else:
+    pages = ((page - 1) * limit) // 50 + 1
+    if (page == 1 and products == []) or len(products) < page * limit:
         products += shopee_search(name, pages)
     with open("products_info_shopee.json", "w") as file:
         json.dump(products_info, file)
@@ -252,17 +223,10 @@ def price(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
-    if (page*limit) % 20 != 0:
-        pages = (page*limit) // 20 + 1
-    else:
-        pages = (page*limit) // 20
-    if page == 1 and products == []:
-        products = pchome_search(name, sort = "價錢由低至高")
-        products += momo_search(name, Type = 2)
-        products += shopee_search(name, order = "asc")
-    elif len(products) < page * limit:
-        products += pchome_search(name, pages, sort = "價錢由低至高")
-        products += momo_search(name, pages, Type = 2)
+    pages = ((page - 1) * limit) // 20 + 1
+    if (page == 1 and products == []) or len(products) < page * limit:
+        products += pchome_search(name, pages, "價錢由低至高")
+        products += momo_search(name, pages, 2)
         products += shopee_search(name, pages, "asc")
     products = sorted(products, key = lambda d: d["price_avg"]) 
     with open("products_info_price.json", "w") as file:
