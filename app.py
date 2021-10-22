@@ -85,10 +85,14 @@ def pchome(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
+    if (page*limit) % 20 != 0:
+        pages = (page*limit) // 20 + 1
+    else:
+        pages = (page*limit) // 20
     if page == 1 and products == []:
         products = pchome_search(name)
     elif len(products) < page * limit:
-        products += pchome_search(name, (page*limit)//20+1)
+        products += pchome_search(name, pages)
     with open("pchome_porducts_info.json", "w") as file:
         json.dump(products_info, file)
     message = ""
@@ -130,7 +134,7 @@ def momo_search(name, page = 1, Type = 1):
         })
     return products
     
-def momo(id, name, pages = 1):
+def momo(id, name, page = 1):
     try:
         with open("products_info_momo.json") as file:
             products_info = json.load(file)
@@ -142,18 +146,22 @@ def momo(id, name, pages = 1):
     except:
         products = []
         products_info = {id: products}
-    if pages == 1 and products == []:
+    if (page*limit) % 20 != 0:
+        pages = (page*limit) // 20 + 1
+    else:
+        pages = (page*limit) // 20
+    if page == 1 and products == []:
         products = momo_search(name)
     else:
         products += momo_search(name, pages)
     with open("products_info_momo.json", "w") as file:
         json.dump(products_info, file)
     message = ""
-    for i in range(limit*(pages-1), limit*pages):
+    for i in range(limit*(page-1), limit*page):
         message += products[i]["link"] + "\n"
         message += products[i]["name"] + "\n"
         message += "$" + products[i]["price"] + "\n"
-    message += " " * 20 + f"[第{pages}頁]"
+    message += " " * 20 + f"[第{page}頁]"
     return message
 
 
@@ -212,11 +220,14 @@ def shopee(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
+    if (page*limit) % 50 != 0:
+        pages = (page*limit) // 50 + 1
+    else:
+        pages = (page*limit) // 50
     if page == 1 and products == []:
         print("check point")
         products = shopee_search(name, 1)
     else:
-        pages = page // (50 // limit) + 1
         products += shopee_search(name, pages)
     with open("products_info_shopee.json", "w") as file:
         json.dump(products_info, file)
@@ -241,12 +252,15 @@ def price(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
+    if (page*limit) % 20 != 0:
+        pages = (page*limit) // 20 + 1
+    else:
+        pages = (page*limit) // 20
     if page == 1 and products == []:
         products = pchome_search(name, sort = "價錢由低至高")
         products += momo_search(name, Type = 2)
         products += shopee_search(name, order = "asc")
     elif len(products) < page * limit:
-        pages = page // (20 // limit) + 1
         products += pchome_search(name, pages, sort = "價錢由低至高")
         products += momo_search(name, pages, Type = 2)
         products += shopee_search(name, pages, "asc")
