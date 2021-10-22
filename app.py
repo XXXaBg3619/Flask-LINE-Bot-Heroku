@@ -387,6 +387,9 @@ def handle_message(event):
         info["mode_off"] = False
         print("mode on")
         message = "mode on"
+    else:
+        print(id)
+        message = id
     with open("search_info.json", "w") as file:
         json.dump(info, file)
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
