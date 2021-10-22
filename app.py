@@ -221,7 +221,8 @@ def shopee_search(name, page = 1):
         title_fix = title.replace(" ", "-")
         if isEmoji(title) == True:
             print("要縮的網址：", f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
-            link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
+            url_fix = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
+            link = make_tiny(url_fix)
             make_tiny = True
         else:
             for i in ("[", "]", "<", ">"):
