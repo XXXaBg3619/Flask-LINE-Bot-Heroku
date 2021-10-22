@@ -85,6 +85,8 @@ def pchome(id, name, page = 1):
     except:
         products = []
         products_info = {id: products}
+    if products != []:
+        print(products)
     if (page*limit) % 20 != 0:
         pages = (page*limit) // 20 + 1
     else:
