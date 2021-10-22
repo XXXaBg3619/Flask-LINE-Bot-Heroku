@@ -313,6 +313,8 @@ def callback():
 def handle_message(event):
     start = time.time()
     text = event.message.text
+    print(type(event))
+    print(event)
     id = event["source"]["userId"]
     try:
         with open("search_info.json") as file:
