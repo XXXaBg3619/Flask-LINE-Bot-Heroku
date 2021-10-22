@@ -221,7 +221,10 @@ def shopee_search(name, page = 1, order = "desc"):
         'x-api-source': 'pc',
         'referer': f'https://shopee.tw/search?keyword={urllib.parse.quote(name)}'
     }
-    url = f'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={name}&limit=50&newest={50*(page-1)}&order={order}&page_type=search&version=2'
+    if order == "desc":
+        url = f'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={name}&limit=20&newest={50*(page-1)}&order=desc&page_type=search&version=2'
+    elif order == "asc":
+        url = f'https://shopee.tw/api/v2/search_items/?by=price&keyword={name}&limit=20&newest={20*(page-1)}&order=asc&page_type=search&version=2'
     resq = requests.Session().get(url, headers=headers)
     if resq.status_code == requests.codes.ok:
         data = resq.json()
@@ -243,13 +246,15 @@ def shopee_search(name, page = 1, order = "desc"):
         if not tiny:
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
-        if order == "asc":
-            price = round((price_max+price_min)/2) if price_min != price_max else int(item["price"]//100000)
-        elif price_min == price_max:
+        if price_min == price_max:
             price = str(int(item["price"] // 100000))
         else:
             price = f"{price_min} ~ {price_max}"
         products.append({"link": link, "name": title, "price": price})
+        if order == "asc":
+            price_avg = round((price_max+price_min)/2) if "~" in price else int(price)
+            products[-1]["price_avg"] = price_avg
+
     return products
 
 def shopee(id, name, page = 1):
@@ -265,10 +270,10 @@ def shopee(id, name, page = 1):
         products = []
         products_info = {id: products}
     if page == 1 and products == []:
-        products = shopee_search(name, 1, "asc")
+        products = shopee_search(name, 1)
     else:
         pages = page // (50 // limit) + 1
-        products += shopee_search(name, pages, "asc")
+        products += shopee_search(name, pages)
     for i in products:
         print(i)
     with open("products_info_shopee.json", "w") as file:
@@ -299,11 +304,10 @@ def price(id, name, page = 1):
         products += shopee_search(name, order = "asc")
     elif len(products) < page * limit:
         print("len:", len(products))
-        pages_pchome = page // (20 // limit) + 1
-        pages_shopee = page // (50 // limit) + 1
-        products += PchomeSpider().search_products(name, pages_pchome, sort = "價錢由低至高")
-        products += shopee_search(name, pages_shopee, "asc")
-    products = sorted(products, key = lambda d: d["price"]) 
+        pages = page // (20 // limit) + 1
+        products += PchomeSpider().search_products(name, pages, sort = "價錢由低至高")
+        products += shopee_search(name, pages, "asc")
+    products = sorted(products, key = lambda d: d["price_avg"]) 
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
     message = ""
