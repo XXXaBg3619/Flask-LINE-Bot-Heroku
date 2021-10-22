@@ -231,7 +231,7 @@ def shopee_search(name, page = 1):
                 make_tiny = False
         if not make_tiny:
             title_fix = title.replace(" ", "-")
-            print("要縮的網址：", f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
+            print("不用縮的網址：", f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
