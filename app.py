@@ -215,46 +215,28 @@ def momo(id, name, pages = 1):
 
 
 # Shopee線上購物 爬蟲
-def shopee_search(name, page = 1, order = "desc"):
+def shopee_search(name, page = 1):
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36 Edg/88.0.705.68',
         'x-api-source': 'pc',
         'referer': f'https://shopee.tw/search?keyword={urllib.parse.quote(name)}'
     }
-    if order == "desc":
-        url = f'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={name}&limit=20&newest={50*(page-1)}&order=desc&page_type=search&version=2'
-    elif order == "asc":
-        url = f'https://shopee.tw/api/v2/search_items/?by=price&keyword={name}&limit=20&newest={20*(page-1)}&order=asc&page_type=search&version=2'
+    url = f'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={name}&limit=50&newest={50*(page-1)}&order=desc&page_type=search&version=2'
     resq = requests.Session().get(url, headers=headers)
     if resq.status_code == requests.codes.ok:
         data = resq.json()
     products = []
     for item in data["items"]:
         title = item["name"]
-        shopid, itemid = item["shopid"], item["itemid"]
         title_fix = title.replace(" ", "-")
-        if isEmoji(title) == True:
-            link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
-            tiny = True
-        else:
-            for i in ("[", "<", ":", "：", "【"):
-                if i in title:
-                    link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
-                    tiny = True
-                    break
-                tiny = False
-        if not tiny:
-            link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
+        shopid, itemid = item["shopid"], item["itemid"]
+        link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
-            price = str(int(item["price"] // 100000))
+            price = str(int(item["price"]) // 100000)
         else:
             price = f"{price_min} ~ {price_max}"
         products.append({"link": link, "name": title, "price": price})
-        if order == "asc":
-            price_avg = round((price_max+price_min)/2) if "~" in price else int(price)
-            products[-1]["price_avg"] = price_avg
-
     return products
 
 def shopee(id, name, page = 1):
