@@ -303,14 +303,14 @@ def price(id, name, page = 1):
         products += PchomeSpider().search_products(name, pages_pchome, sort = "價錢由低至高")
         products += shopee_search(name, pages_shopee, "asc")
     print(products[0])
-    products = sorted(products, key = lambda d: d["price_avg"]) 
+    products = sorted(products, key = lambda d: d["price"]) 
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
     message = ""
     for i in range(limit*(page-1), limit*page):
         message += products[i]["link"] + "\n"
         message += products[i]["name"] + "\n"
-        message += "$" + str(products[i]["price_avg"]) + "\n"
+        message += "$" + str(products[i]["price"]) + "\n"
     message += " " * 20 + f"[第{page}頁]"
     return message
     
