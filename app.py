@@ -234,7 +234,7 @@ def shopee_search(name, page = 1, order = "desc"):
             link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
             tiny = True
         else:
-            for i in ("[", "]", "<", ">"):
+            for i in ("[", "<", ":", "：", "【"):
                 if i in title:
                     link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
                     tiny = True
@@ -302,7 +302,8 @@ def price(id, name, page = 1):
         pages_shopee = page // (50 // limit) + 1
         products += PchomeSpider().search_products(name, pages_pchome, sort = "價錢由低至高")
         products += shopee_search(name, pages_shopee, "asc")
-    products = sorted(products, key = lambda d: d['price_avg']) 
+    print(products[0])
+    products = sorted(products, key = lambda d: d["price_avg"]) 
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
     message = ""
