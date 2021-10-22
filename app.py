@@ -70,7 +70,7 @@ def pchome_search(keyword, page=1, sort='有貨優先'):
     products = data['prods']
     for i in products:
         i["link"] = "https://24h.pchome.com.tw/prod/" + i["Id"]
-        i["price_avg"] = i["price"]
+        i["price_avg"] = int(i["price"])
     return products
 
 def pchome(id, name, page = 1):
@@ -113,7 +113,7 @@ def momo_search(name, page = 1, Type = 1):
         item_url = 'http://m.momoshop.com.tw' + elem.find('a')['href']
         item_name = elem.find("h3", "prdName").text.strip()
         item_price = elem.find("b", {"class": "price"}).text.strip()
-        products.append({'link': item_url, 'name': item_name, 'price': item_price, 'price_avg': item_price})
+        products.append({'link': item_url, 'name': item_name, 'price': item_price, 'price_avg': int(item_price)})
     return products
     
 def momo(id, name, page = 1):
