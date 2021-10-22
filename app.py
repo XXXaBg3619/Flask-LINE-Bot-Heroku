@@ -381,8 +381,10 @@ def handle_message(event):
         message = Help
     elif text == "mode:off" and id == id_developer:
         info["mode_off"] = True
+        message = "mode off"
     elif text == "mode:on" and id == id_developer:
         info["mode_off"] = False
+        message = "mode on"
     with open("search_info.json", "w") as file:
         json.dump(info, file)
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
