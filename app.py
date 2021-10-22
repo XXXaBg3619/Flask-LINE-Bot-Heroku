@@ -254,7 +254,7 @@ def shopee_search(name, page = 1, order = "desc"):
             products[-1]["price_avg"] = price_avg
     return products
 
-def shopee(name, page = 1):
+def shopee(id, name, page = 1):
     try:
         with open("products_info_shopee.json") as file:
             products_info = json.load(file)
