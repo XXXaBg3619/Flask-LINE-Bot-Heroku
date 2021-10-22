@@ -38,9 +38,10 @@ def Append(s):
     return s
 
 store_name = {
-        "pchome": ["pchome", "Pchome", "PChome24h"],
+        "pchome": ["pchome", "Pchome", "PChome", "PChome24h"],
         "momo": ["momo", "Momo", "MOMO"],
-        "shopee": ["shopee", "Shopee"]
+        "shopee": ["shopee", "Shopee"],
+        "price": ["price", "Price"]
     }
 store_name = Append(store_name)
 
@@ -218,6 +219,7 @@ def shopee_search(name, page = 1):
         title = item["name"]
         shopid, itemid = item["shopid"], item["itemid"]
         if isEmoji(title) == True:
+            print("要縮的網址：", f"https://shopee.tw/{title}-i.{shopid}.{itemid}")
             link = make_tiny(f"https://shopee.tw/{title}-i.{shopid}.{itemid}")
             make_tiny = True
         else:
@@ -229,6 +231,7 @@ def shopee_search(name, page = 1):
                 make_tiny = False
         if not make_tiny:
             title_fix = title.replace(" ", "-")
+            print("要縮的網址：", f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
@@ -259,8 +262,34 @@ def shopee(name, page = 1):
     message += " " * 20 + f"[第{page}頁]"
     return message
 
+
+# def price(name, page = 1):
+#     try:
+#         with open("products_info_price.json") as file:
+#             products = json.load(file)
+#     except:
+#         products = []
+#     if page == 1:
+#         products = PchomeSpider().search_products(name)
+#         products += shopee_search(name)
+#     else:
+#         pages = page // (50 // limit) + 1
+#         products += shopee_search(name, pages)
     
-    
+
+def search(info, page):
+    if info["platform"] in store_name["pchome"]:
+        print("Search on PChome")
+        return pchome(info["search_name"], page)
+    elif info["platform"] in store_name["momo"]:
+        print("Search on MOMO")
+        return momo(info["search_name"], page)
+    elif info["platform"] in store_name["shopee"]:
+        return shopee(info["search_name"], page)
+    # elif info["platform"] in store_name["price"]:
+    #     message = price(info["search_name"], page)
+
+
 
 # 接收 LINE 的資訊
 @app.route("/", methods=['POST'])
@@ -284,26 +313,20 @@ def handle_message(event):
     if ";" in text:
         info["search_name"], info["platform"] = text.split(";")
         print("info:", info)
-        if info["platform"] in store_name["pchome"]:
-            print("Search on PChome")
-            message = pchome(info["search_name"])
-        elif info["platform"] in store_name["momo"]:
-            print("Search on MOMO")
-            message = momo(info["search_name"])
-        elif info["platform"] in store_name["shopee"]:
-            message = shopee(info["search_name"])
+        page = 1
+        with open("search_info.json", "w") as file:
+                json.dump(info, file)
+    elif "；" in text:
+        info["search_name"], info["platform"] = text.split("；")
+        print("info:", info)
+        page = 1
         with open("search_info.json", "w") as file:
                 json.dump(info, file)
     elif text.isdigit() == True:
         with open("search_info.json") as file:
             info = json.load(file)
-        if info["platform"] == "pchome":
-            message = pchome(info["search_name"], int(text))
-        elif info["platform"] == "momo":
-            message = momo(info["search_name"], int(text))
-        elif info["platform"] == "shopee":
-            message = shopee(info["search_name"], int(text))
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
+        page = int(text)
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text = search(info, page)))
     end = time.time()
     print("time:", end - start, "s")
 
