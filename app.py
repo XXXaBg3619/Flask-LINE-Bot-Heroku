@@ -230,7 +230,6 @@ def shopee_search(name, page = 1, order = "desc"):
         shopid, itemid = item["shopid"], item["itemid"]
         title_fix = title.replace(" ", "-")
         if isEmoji(title) == True:
-            print("要縮的網址：", f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
             link = make_tiny(f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
             tiny = True
         else:
@@ -241,7 +240,6 @@ def shopee_search(name, page = 1, order = "desc"):
                     break
                 tiny = False
         if not tiny:
-            print("不用縮的網址：", f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
@@ -302,7 +300,8 @@ def price(id, name, page = 1):
         pages_shopee = page // (50 // limit) + 1
         products += PchomeSpider().search_products(name, pages_pchome, sort = "價錢由低至高")
         products += shopee_search(name, pages_shopee, "asc")
-    print(products[0])
+    for i in products:
+        print(i["price"])
     products = sorted(products, key = lambda d: d["price"]) 
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
@@ -329,7 +328,7 @@ def search(id, info, page = 1):
     elif info["platform"] == "shopee":
         return shopee(id, info["search_name"], page)
     elif info["platform"] == "price":
-        message = price(id, info["search_name"], page)
+        return price(id, info["search_name"], page)
     else:
         return """無法搜尋到商品
         請確認商品名稱或平台名稱是否有誤～"""
@@ -353,8 +352,6 @@ def callback():
 def handle_message(event):
     start = time.time()
     text = event.message.text
-    # print(type(event))
-    # print(event)
     id = event.source.user_id
     try:
         with open("search_info.json") as file:
