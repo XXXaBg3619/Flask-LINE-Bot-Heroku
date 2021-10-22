@@ -250,8 +250,8 @@ def shopee_search(name, page = 1, order = "desc"):
             price = f"{price_min} ~ {price_max}"
         products.append({"link": link, "name": title, "price": price})
         if order == "asc":
-            price_avg = round((price_max+price_min)/2) if "~" in price else int(price)
-            products[-1]["price_avg"] = price_avg
+            price = round((price_max+price_min)/2) if "~" in price else int(price)
+        products.append({"link": link, "name": title, "price": price})
     return products
 
 def shopee(id, name, page = 1):
