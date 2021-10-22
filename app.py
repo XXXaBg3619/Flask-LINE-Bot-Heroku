@@ -120,7 +120,7 @@ class PchomeSpider():
                 break
         return products
 
-def pchome(name, page = 1):
+def pchome(id, name, page = 1):
     try:
         with open("products_info_pchome.json") as file:
             products_info = json.load(file)
@@ -186,7 +186,7 @@ def momo_search(keyword, pages = 1):
         json.dump(products, file)
     return products
     
-def momo(name, pages = 1):
+def momo(id, name, pages = 1):
     try:
         with open("products_info_momo.json") as file:
             products_info = json.load(file)
