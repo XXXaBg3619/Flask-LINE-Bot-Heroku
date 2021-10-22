@@ -320,7 +320,7 @@ def price(id, name, page = 1):
     elif len(products) < page * limit:
         print("len:", len(products))
         pages = page // (20 // limit) + 1
-        products += PchomeSpider().search_products(name, pages, sort = "價錢由低至高")
+        products = PchomeSpider().search_products(name, pages, sort = "價錢由低至高")
         products += shopee_search(name, pages, "asc")
     products = sorted(products, key = lambda d: d["price_avg"]) 
     with open("products_info_price.json", "w") as file:
