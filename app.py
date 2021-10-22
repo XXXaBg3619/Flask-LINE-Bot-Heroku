@@ -242,13 +242,12 @@ def shopee_search(name, page = 1, order = "desc"):
         if not tiny:
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
-        if price_min == price_max:
+        if order == "asc":
+            price = round((price_max+price_min)/2) if "~" in price else int(item["price"]//100000)
+        elif price_min == price_max:
             price = str(int(item["price"] // 100000))
         else:
             price = f"{price_min} ~ {price_max}"
-        products.append({"link": link, "name": title, "price": price})
-        if order == "asc":
-            price = round((price_max+price_min)/2) if "~" in price else int(price)
         products.append({"link": link, "name": title, "price": price})
     return products
 
