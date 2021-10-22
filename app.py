@@ -116,9 +116,10 @@ class PchomeSpider():
                 print('找不到有關的產品')
                 break
             products.extend(data['prods'])
-            products[-1]["link"] = "https://24h.pchome.com.tw/prod/" + products[-1]["Id"]
             if data['totalPage'] <= params['page']:
                 break
+        for i in products:
+            i["link"] = "https://24h.pchome.com.tw/prod/" + i["Id"]
         return products
 
 def pchome(id, name, page = 1):
