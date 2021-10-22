@@ -29,6 +29,9 @@ momo回傳時間約10~15秒 (可悲慢
 
 若是需要查詢使用方式則輸入help即可
 祝泥使用愉快～"""
+# products_info = {id: products, ...}
+# products = [{"url": url, "name": name, "price": price}, ...]
+
 
 
 def make_tiny(url):
@@ -119,18 +122,23 @@ class PchomeSpider():
 
 def pchome(name, page = 1):
     try:
-        with open("pchome_porducts_info.json") as file:
-            print("存在商品搜尋紀錄")
-            products = json.load(file)
+        with open("products_info_pchome.json") as file:
+            products_info = json.load(file)
+            try:
+                products = products_info[id]
+            except:
+                products = {}
+                products_info[id] = products
     except:
-        products = []
+        products = {}
+        products_info = {id: products}
     if page == 1:
         products = PchomeSpider().search_products(name)
     elif len(products) < page * limit:
         print("爬出下20筆商品資訊")
         products = PchomeSpider().search_products(name, (page*limit)//20+1)
     with open("pchome_porducts_info.json", "w") as file:
-        json.dump(products, file)
+        json.dump(products_info, file)
     message = ""
     print("len(products):", len(products))
     for i in range(limit*(page-1), limit*page):
@@ -181,15 +189,21 @@ def momo_search(keyword, pages = 1):
 def momo(name, pages = 1):
     try:
         with open("products_info_momo.json") as file:
-            products = json.load(file)
+            products_info = json.load(file)
+            try:
+                products = products_info[id]
+            except:
+                products = {}
+                products_info[id] = products
     except:
-        products = []
+        products = {}
+        products_info = {id: products}
     if pages == 1:
         products = momo_search(name)
     else:
         products += momo_search(name, pages)
     with open("products_info_momo.json", "w") as file:
-        json.dump(products, file)
+        json.dump(products_info, file)
     message = ""
     for i in range(limit*(pages-1), limit*pages):
         message += products[i]["link"] + "\n"
@@ -200,13 +214,13 @@ def momo(name, pages = 1):
 
 
 # Shopee線上購物 爬蟲
-def shopee_search(name, page = 1):
+def shopee_search(name, page = 1, order = "desc"):
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36 Edg/88.0.705.68',
         'x-api-source': 'pc',
         'referer': f'https://shopee.tw/search?keyword={urllib.parse.quote(name)}'
     }
-    url = f'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={name}&limit=50&newest={50*(page-1)}&order=desc&page_type=search&version=2'
+    url = f'https://shopee.tw/api/v2/search_items/?by=relevancy&keyword={name}&limit=50&newest={50*(page-1)}&order={order}&page_type=search&version=2'
     resq = requests.Session().get(url, headers=headers)
     if resq.status_code == requests.codes.ok:
         data = resq.json()
@@ -231,25 +245,34 @@ def shopee_search(name, page = 1):
             link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
-            price = str(int(item["price"]) // 100000)
+            price = str(int(item["price"] // 100000))
         else:
             price = f"{price_min} ~ {price_max}"
         products.append({"link": link, "name": title, "price": price})
+        if order == "asc":
+            price_avg = round((price_max+price_min)/2) if "~" in price else int(price)
+            products[-1]["price_avg"] = price_avg
     return products
 
 def shopee(name, page = 1):
     try:
         with open("products_info_shopee.json") as file:
-            products = json.load(file)
+            products_info = json.load(file)
+            try:
+                products = products_info[id]
+            except:
+                products = {}
+                products_info[id] = products
     except:
-        products = []
+        products = {}
+        products_info = {id: products}
     if page == 1:
         products = shopee_search(name)
     else:
         pages = page // (50 // limit) + 1
         products += shopee_search(name, pages)
     with open("products_info_shopee.json", "w") as file:
-        json.dump(products, file)
+        json.dump(products_info, file)
     message = ""
     for i in range(limit*(page-1), limit*page):
         message += products[i]["link"] + "\n"
@@ -259,21 +282,39 @@ def shopee(name, page = 1):
     return message
 
 
-# def price(name, page = 1):
-#     try:
-#         with open("products_info_price.json") as file:
-#             products = json.load(file)
-#     except:
-#         products = []
-#     if page == 1:
-#         products = PchomeSpider().search_products(name)
-#         products += shopee_search(name)
-#     else:
-#         pages = page // (50 // limit) + 1
-#         products += shopee_search(name, pages)
+def price(id, name, page = 1):
+    try:
+        with open("products_info_price.json") as file:
+            products_info = json.load(file)
+            try:
+                products = products_info[id]
+            except:
+                products = {}
+                products_info[id] = products
+    except:
+        products = {}
+        products_info = {id: products}
+    if page == 1:
+        products = PchomeSpider().search_products(name, sort = "價錢由低至高")
+        products += shopee_search(name, order = "asc")
+    elif len(products) < page * limit:
+        pages_pchome = page // (20 // limit) + 1
+        pages_shopee = page // (50 // limit) + 1
+        products += PchomeSpider().search_products(name, pages_pchome, sort = "價錢由低至高")
+        products += shopee_search(name, pages_shopee, "asc")
+    products = sorted(products, key = lambda d: d['price_avg']) 
+    with open("products_info_price.json", "w") as file:
+        json.dump(products_info, file)
+    message = ""
+    for i in range(limit*(page-1), limit*page):
+        message += products[i]["link"] + "\n"
+        message += products[i]["name"] + "\n"
+        message += "$" + str(products[i]["price_avg"]) + "\n"
+    message += " " * 20 + f"[第{page}頁]"
+    return message
     
 
-def search(info, page = 1):
+def search(id, info, page = 1):
     info["platform"] = info["platform"].lower().rstrip().strip()
     if len(info["platform"]) >= 6:
         info["platform"] = info["platform"][:6]
@@ -282,14 +323,14 @@ def search(info, page = 1):
     print("info:", info)
     if info["platform"] == "pchome":
         print("Search on PChome")
-        return pchome(info["search_name"], page)
+        return pchome(id, info["search_name"], page)
     elif info["platform"] in ("momo", "蝦皮"):
         print("Search on MOMO")
-        return momo(info["search_name"], page)
+        return momo(id, info["search_name"], page)
     elif info["platform"] == "shopee":
-        return shopee(info["search_name"], page)
+        return shopee(id, info["search_name"], page)
     # elif info["platform"] in store_name["price"]:
-    #     message = price(info["search_name"], page)
+    #     message = price(id, info["search_name"], page)
     else:
         return """無法搜尋到商品
         請確認商品名稱或平台名稱是否有誤～"""
@@ -315,20 +356,27 @@ def handle_message(event):
     text = event.message.text
     # print(type(event))
     # print(event)
-    id = event.source.user_id
+    line_bot_api = LineBotApi('<channel access token>')
+    id = line_bot_api.get_profile('<user_id>')
     try:
         with open("search_info.json") as file:
             info = json.load(file)
+            try:
+                info_id = info[id]
+            except:
+                info_id = {}
+                info[id] = info_id
     except:
-        info = {id: {}}
+        info_id = {}
+        info = {id: info_id}
     if ";" in text:
-        info[id]["search_name"], info[id]["platform"] = text.split(";")
-        message = search(info[id])
+        info_id["search_name"], info_id["platform"] = text.split(";")
+        message = search(id, info_id)
     elif "；" in text:
-        info[id]["search_name"], info[id]["platform"] = text.split("；")
-        message = search(info[id])
+        info_id["search_name"], info_id["platform"] = text.split("；")
+        message = search(id, info_id)
     elif text.isdigit() == True:
-        message = search(info[id], int(text))
+        message = search(id, info_id, int(text))
     elif text.lower().rstrip().strip()[:4] == "help":
         message = Help
     with open("search_info.json", "w") as file:
