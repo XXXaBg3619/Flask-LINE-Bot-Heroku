@@ -18,20 +18,30 @@ id_developer = "U1e38384f12f22c77281ec3e8611025c8"
 
 
 limit = 5    # 每次傳送之商品數上限
-Help = """若想在 pchome/momo/shopee 搜尋商品
-請傳：  商品名稱;平台 (大小寫、全半型皆可)
-ex:  PS5;pchome 、 滑鼠；MOMO
-要看下一頁則輸入2 3 4 5.... (請不要跳頁)
+Help = """搜尋功能】
+若想在 pchome/momo/shopee 搜尋商品
+請輸入：  商品名稱;平台 (英文請輸入半型)
+Ex:  PS5;pchome 、 滑鼠；MOMO
+要看下一頁則輸入2 3 4 5.... (請不要向後跳頁)
 
-*注意*
+【比價功能】
+請輸入： 商品名稱:price  (英文請輸入半型)
+Ex:  PS5;price 、 滑鼠；Price
+要看下一頁則輸入2 3 4 5.... (請不要向後跳頁)
+＊目前只能從最低價開始排＊
+＊只有pchome/shopee的商品＊
+
+【注意】
 pchome回傳時間約1~3秒
 shopee回傳時間約3~5秒
-momo回傳時間約10~15秒 (可悲慢
+momo回傳時間約10~15秒 Σ(=ω= ;)
+price回傳時間約3~5秒
 
 若是需要查詢使用方式則輸入help即可
 祝泥使用愉快～"""
 mode_off = """機器人目前測試中
-請稍後再使用"""
+請稍後再使用
+輸入help可查詢使用方式及新增功能"""
 Except = """無法搜尋到商品
 請確認輸入是否有誤～"""
 # products_info = {id: products, ...}
@@ -368,7 +378,9 @@ def handle_message(event):
     except:
         info_id = {}
         info = {"mode_off": False, id: info_id}
-    if info["mode_off"] and id != id_developer:
+    if text.lower().rstrip().strip() == "help":
+        message = Help
+    elif info["mode_off"] and id != id_developer:
         message = mode_off
     elif ";" in text:
         info_id["search_name"], info_id["platform"] = text.split(";")
@@ -378,8 +390,6 @@ def handle_message(event):
         message = search(id, info_id)
     elif text.isdigit() == True:
         message = search(id, info_id, int(text))
-    elif text.lower().rstrip().strip()[:4] == "help":
-        message = Help
     elif text == "mode off" and id == id_developer:
         info["mode_off"] = True
         print("mode off")
