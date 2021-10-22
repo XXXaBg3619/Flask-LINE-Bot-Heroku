@@ -18,7 +18,7 @@ id_developer = "U1e38384f12f22c77281ec3e8611025c8"
 
 
 limit = 5    # 每次傳送之商品數上限
-Help = """【【搜尋功能】
+Help = """【搜尋功能】
 若想在 pchome/momo/shopee 搜尋商品
 請輸入：  商品名稱;平台 
 (英文請輸入半型)
@@ -33,10 +33,10 @@ Ex:  PS5;price 、 滑鼠；Price
 *目前只能從最低價開始排*
 
 【注意】
-pchome回傳時間約1~3秒
-shopee回傳時間約3~5秒
-momo回傳時間約1~3秒
-price回傳時間約3~5秒
+pchome回傳時間<3秒
+momo回傳時間<3秒
+shopee回傳時間<4秒
+price回傳時間<6秒
 
 若是需要查詢使用方式則輸入help即可
 祝泥使用愉快～"""
@@ -62,7 +62,7 @@ def isEmoji(content):
 
 
 # PChome線上購物 爬蟲
-def pchome_search(keyword, page=1, sort='有貨優先'):
+def pchome_search(keyword, page, sort='有貨優先'):
     all_sort = {'有貨優先': 'sale/dc', '價錢由高至低': 'prc/dc', '價錢由低至高': 'prc/ac'}
     name_enc = urllib.parse.quote(keyword) 
     url = f"https://ecshweb.pchome.com.tw/search/v3.3/all/results?q={name_enc}&page={page}&sort={all_sort[sort]}"
@@ -73,7 +73,7 @@ def pchome_search(keyword, page=1, sort='有貨優先'):
         i["price_avg"] = int(i["price"])
     return products
 
-def pchome(id, name, page = 1):
+def pchome(id, name, page):
     try:
         with open("products_info_pchome.json") as file:
             products_info = json.load(file)
@@ -99,7 +99,7 @@ def pchome(id, name, page = 1):
     return message
 
 # MOMO線上購物 爬蟲
-def momo_search(name, page = 1, Type = 1):
+def momo_search(name, page, Type = 1):
     name_enc = urllib.parse.quote(name)
     url = f"https://m.momoshop.com.tw/search.momo?searchKeyword={name_enc}&searchType={Type}&cateLevel=-1&curPage={page}&maxPage=16.html"
     headers = {'User-Agent': 'mozilla/5.0 (Linux; Android 6.0.1; '
@@ -116,7 +116,7 @@ def momo_search(name, page = 1, Type = 1):
         products.append({'link': item_url, 'name': item_name, 'price': item_price, 'price_avg': int(item_price)})
     return products
     
-def momo(id, name, page = 1):
+def momo(id, name, page):
     try:
         with open("products_info_momo.json") as file:
             products_info = json.load(file)
@@ -143,7 +143,7 @@ def momo(id, name, page = 1):
 
 
 # Shopee線上購物 爬蟲
-def shopee_search(name, page = 1, order = "desc"):
+def shopee_search(name, page, order = "desc", by = "relevancy"):
     headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36 Edg/88.0.705.68',
         'x-api-source': 'pc',
@@ -153,7 +153,7 @@ def shopee_search(name, page = 1, order = "desc"):
         new = 50
     elif order == "asc":
         new = 20
-    url = f'https://shopee.tw/api/v2/search_items/?by=price&keyword={name}&limit=20&newest={new*(page-1)}&order={order}&page_type=search&version=2'
+    url = f'https://shopee.tw/api/v2/search_items/?by={by}&keyword={name}&limit=20&newest={new*(page-1)}&order={order}&page_type=search&version=2'
     resq = requests.Session().get(url, headers=headers)
     if resq.status_code == requests.codes.ok:
         data = resq.json()
@@ -185,7 +185,7 @@ def shopee_search(name, page = 1, order = "desc"):
             products[-1]["price_avg"] = price_avg
     return products
 
-def shopee(id, name, page = 1):
+def shopee(id, name, page):
     try:
         with open("products_info_shopee.json") as file:
             products_info = json.load(file)
@@ -211,7 +211,10 @@ def shopee(id, name, page = 1):
     return message
 
 
-def price(id, name, page = 1):
+def price(id, name, page, sort):
+    pc = {"lth": "價錢由低至高", "htl": "價錢由高至低"}
+    mo = {"lth": 2, "htl": 3}
+    sh = {"lth": "asc", "htl": "價錢由高至低"}
     try:
         with open("products_info_price.json") as file:
             products_info = json.load(file)
@@ -225,9 +228,9 @@ def price(id, name, page = 1):
         products_info = {id: products}
     pages = ((page - 1) * limit) // 20 + 1
     if (page == 1 and products == []) or len(products) < page * limit:
-        products += pchome_search(name, pages, "價錢由低至高")
-        products += momo_search(name, pages, 2)
-        products += shopee_search(name, pages, "asc")
+        products += pchome_search(name, pages, pc[sort])
+        products += momo_search(name, pages, mo[sort])
+        products += shopee_search(name, pages, sh[sort], "price")
     products = sorted(products, key = lambda d: d["price_avg"]) 
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
@@ -252,8 +255,10 @@ def search(id, info, page = 1):
         return momo(id, info["search_name"], page)
     elif info["platform"] in ("shopee", "蝦皮"):
         return shopee(id, info["search_name"], page)
-    elif info["platform"] == "price":
-        return price(id, info["search_name"], page)
+    elif info["platform"] == "price1":
+        return price(id, info["search_name"], page, "lth")
+    elif info["platform"] == "price2":
+        return price(id, info["search_name"], page, "htl")
     else:
         return Except
 
