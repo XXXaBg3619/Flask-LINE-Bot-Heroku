@@ -77,29 +77,23 @@ def pchome(id, name, page = 1):
     try:
         with open("products_info_pchome.json") as file:
             products_info = json.load(file)
-            print("1-0")
             try:
                 products = products_info[id]
-                print("1-1")
             except:
                 products = []
                 products_info[id] = products
-                print("1-2")
     except:
         products = []
         products_info = {id: products}
-        print("1-3")
     if (page*limit) % 20 != 0:
         pages = (page*limit) // 20 + 1
     else:
         pages = (page*limit) // 20
     if page == 1 and products == []:
         products = pchome_search(name)
-        print("len:", len(products))
     elif len(products) < page * limit:
-        print("check point")
         products += pchome_search(name, pages)
-    with open("pchome_porducts_info.json", "w") as file:
+    with open("products_info_pchome.json", "w") as file:
         json.dump(products_info, file)
     message = ""
     for i in range(limit*(page-1), limit*page):
