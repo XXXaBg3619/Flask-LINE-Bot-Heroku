@@ -381,9 +381,11 @@ def handle_message(event):
         message = Help
     elif text == "mode:off" and id == id_developer:
         info["mode_off"] = True
+        print("mode off")
         message = "mode off"
     elif text == "mode:on" and id == id_developer:
         info["mode_off"] = False
+        print("mode on")
         message = "mode on"
     with open("search_info.json", "w") as file:
         json.dump(info, file)
