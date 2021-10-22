@@ -130,7 +130,7 @@ def momo(id, name, page = 1):
         products_info = {id: products}
     pages = ((page - 1) * limit) // 20 + 1
     if (page == 1 and products == []) or len(products) < page * limit:
-        products = +momo_search(name, pages)
+        products += momo_search(name, pages)
     with open("products_info_momo.json", "w") as file:
         json.dump(products_info, file)
     message = ""
