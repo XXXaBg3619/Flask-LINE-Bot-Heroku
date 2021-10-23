@@ -87,7 +87,7 @@ def pchome(id, name, page):
     except:
         products = []
         products_info = {id: {"name": name, "products": products}}
-    if products_info[id]["names"] != name:
+    if products_info[id]["name"] != name:
         products = []
         products_info = {id: {"name": name, "products": products}}
     pages = ((page - 1) * limit) // 20 + 1
