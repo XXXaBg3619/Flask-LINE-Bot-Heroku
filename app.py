@@ -248,6 +248,7 @@ def price(id, name, page, sort):
     
 
 def search(id, info, page = 1):
+    print(info)
     if len(info["platform"]) >= 6:
         info["platform"] = info["platform"][:6]
     if info["platform"] == "pchome":
@@ -295,7 +296,7 @@ def handle_message(event):
                 info[id] = info_id
     except:
         info_id = {}
-        info = {"mode_off": False, id: info_id}
+        info = {"mode_off": True, id: info_id}
     if text == "help":
         message = Help
     elif info["mode_off"] and id != id_developer:
