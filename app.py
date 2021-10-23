@@ -149,11 +149,7 @@ def shopee_search(name, page, order = "desc", by = "relevancy"):
         'x-api-source': 'pc',
         'referer': f'https://shopee.tw/search?keyword={urllib.parse.quote(name)}'
     }
-    if order == "desc":
-        new = 50
-    elif order == "asc":
-        new = 20
-    url = f'https://shopee.tw/api/v2/search_items/?by={by}&keyword={name}&limit=20&newest={new*(page-1)}&order={order}&page_type=search&version=2'
+    url = f'https://shopee.tw/api/v2/search_items/?by={by}&keyword={name}&limit=20&newest={20*(page-1)}&order={order}&page_type=search&version=2'
     resq = requests.Session().get(url, headers=headers)
     if resq.status_code == requests.codes.ok:
         data = resq.json()
@@ -197,7 +193,7 @@ def shopee(id, name, page):
     except:
         products = []
         products_info = {id: products}
-    pages = ((page - 1) * limit) // 50 + 1
+    pages = ((page - 1) * limit) // 20 + 1
     if (page == 1 and products == []) or len(products) < page * limit:
         products += shopee_search(name, pages)
     with open("products_info_shopee.json", "w") as file:
