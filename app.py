@@ -126,13 +126,16 @@ def momo(id, name, page):
         with open("products_info_momo.json") as file:
             products_info = json.load(file)
             try:
-                products = products_info[id]
+                products = products_info[id]["products"]
             except:
                 products = []
-                products_info[id] = products
+                products_info[id]["products"] = products
     except:
         products = []
-        products_info = {id: products}
+        products_info = {id: {"name": name, "products": products}}
+    if products_info[id]["name"] != name:
+        products = []
+        products_info = {id: {"name": name, "products": products}}
     pages = ((page - 1) * limit) // 20 + 1
     if (page == 1 and products == []) or len(products) < page * limit:
         products += momo_search(name, pages)
@@ -191,13 +194,16 @@ def shopee(id, name, page):
         with open("products_info_shopee.json") as file:
             products_info = json.load(file)
             try:
-                products = products_info[id]
+                products = products_info[id]["products"]
             except:
                 products = []
-                products_info[id] = products
+                products_info[id]["products"] = products
     except:
         products = []
-        products_info = {id: products}
+        products_info = {id: {"name": name, "products": products}}
+    if products_info[id]["name"] != name:
+        products = []
+        products_info = {id: {"name": name, "products": products}}
     pages = ((page - 1) * limit) // 20 + 1
     if (page == 1 and products == []) or len(products) < page * limit:
         products += shopee_search(name, pages)
@@ -299,7 +305,7 @@ def handle_message(event):
                 info[id] = info_id
     except:
         info_id = {}
-        info = {"mode_off": True, id: info_id}
+        info = {"mode_off": False, id: info_id}
     if text == "help":
         message = Help
     elif info["mode_off"] and id != id_developer:
