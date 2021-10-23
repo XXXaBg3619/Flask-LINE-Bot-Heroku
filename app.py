@@ -23,14 +23,16 @@ Help = """【搜尋功能】
 請輸入：  商品名稱;平台 
 (英文請輸入半型)
 Ex:  PS5;pchome 、 滑鼠；MOMO
-要看下一頁則輸入2 3 4 5.... (請不要向後跳頁)
+要看下一頁則輸入2 3 4 5....
 
 【比價功能】
-請輸入： 商品名稱;price  
+請輸入： 商品名稱;price1/price2
 (英文請輸入半型)
-Ex:  PS5;price 、 滑鼠；Price
-要看下一頁則輸入2 3 4 5.... (請不要向後跳頁)
-*目前只能從最低價開始排*
+price1：從最低價開始排
+price2：從最高價開始排
+Ex:  PS5;price1 、 滑鼠；Price2
+要看下一頁則輸入2 3 4 5....
+
 
 【注意】
 pchome回傳時間<3秒
@@ -291,7 +293,7 @@ def handle_message(event):
                 info[id] = info_id
     except:
         info_id = {}
-        info = {"mode_off": True, id: info_id}
+        info = {"mode_off": False, id: info_id}
     if text == "help":
         message = Help
     elif info["mode_off"] and id != id_developer:
