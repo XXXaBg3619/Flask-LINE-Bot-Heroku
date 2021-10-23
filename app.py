@@ -229,7 +229,7 @@ def price(id, name, page, sort):
         products += shopee_search(name, pages, sh[sort], "price")
     products = sorted(products, key = lambda d: d["price_avg"])
     if sort == "htl":
-        products = products.reverse()
+        products.reverse()
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
     message = ""
