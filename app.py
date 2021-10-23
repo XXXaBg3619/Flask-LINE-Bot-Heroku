@@ -1,13 +1,12 @@
 from flask import Flask, request, abort
-
 from linebot import LineBotApi, WebhookHandler
-
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 from random import choice
 import os
 import psycopg2
 from random import choice
+
 text_all = [True, False]
 app = Flask(__name__)
 
@@ -28,18 +27,14 @@ def callback():
 
 DATABASE_URL = 'postgres://xseaswlvhvhgnm:a6383e19f7ab5a17b0b89671e2d8c363ce18a229550faaac57d61058e8269929@ec2-34-233-64-238.compute-1.amazonaws.com:5432/de3mlq5i95dhst'
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-
 cursor = conn.cursor()
 record = (choice(text_all))
 table_columns = '(orderstate)'
 postgres_insert_query = f"""INSERT INTO orderInfo {table_columns} VALUES (%s);"""
 
-
-cursor.execute(postgres_insert_query, record)
-
+cursor.execute(postgres_insert_query)
 conn.commit()
 count = cursor.rowcount
-
 
 cursor.close()
 conn.close()
