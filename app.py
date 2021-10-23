@@ -227,7 +227,7 @@ def price(id, name, page, sort):
         products += pchome_search(name, pages, pc[sort])
         products += momo_search(name, pages, mo[sort])
         products += shopee_search(name, pages, sh[sort], "price")
-    print(len(products))
+    print(products[0])
     products = sorted(products, key = lambda d: d["price_avg"])
     if sort == "htl":
         products = products.reverse()
