@@ -87,6 +87,12 @@ def pchome(id, name, page):
     except:
         products = []
         products_info = {id: products}
+    try:
+        if products["names"] != name:
+            products = []
+            products_info = {id: products}
+    except:
+        pass
     pages = ((page - 1) * limit) // 20 + 1
     if (page == 1 and products == []) or len(products) < page * limit:
         products += pchome_search(name, pages)
