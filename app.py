@@ -227,8 +227,6 @@ def price(id, name, page, sort):
         products += pchome_search(name, pages, pc[sort])
         products += momo_search(name, pages, mo[sort])
         products += shopee_search(name, pages, sh[sort], "price")
-    for i in range(60):
-        print(i, products[i]["link"], "\n")
     products = sorted(products, key = lambda d: d["price_avg"])
     if sort == "htl":
         products = products.reverse()
@@ -236,6 +234,7 @@ def price(id, name, page, sort):
         json.dump(products_info, file)
     message = ""
     for i in range(limit*(page-1), limit*page):
+        print("i:", i)
         message += products[i]["link"] + "\n"
         if "pchome" in products[i]["link"]:
             message += "〈PChome〉" + products[i]["name"] + "\n"
