@@ -224,9 +224,10 @@ def price(id, name, page, sort):
         products_info = {id: products}
     pages = ((page - 1) * limit) // 20 + 1
     if (page == 1 and products == []) or len(products) < page * limit:
-        #roducts += pchome_search(name, pages, pc[sort])
+        products += pchome_search(name, pages, pc[sort])
         products += momo_search(name, pages, mo[sort])
-        #products += shopee_search(name, pages, sh[sort], "price")
+        products += shopee_search(name, pages, sh[sort], "price")
+    print(len(products))
     products = sorted(products, key = lambda d: d["price_avg"])
     if sort == "htl":
         products = products.reverse()
