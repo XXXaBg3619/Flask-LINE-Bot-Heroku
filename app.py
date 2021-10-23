@@ -214,7 +214,7 @@ def shopee(id, name, page):
 def price(id, name, page, sort):
     pc = {"lth": "價錢由低至高", "htl": "價錢由高至低"}
     mo = {"lth": 2, "htl": 3}
-    sh = {"lth": "asc", "htl": "價錢由高至低"}
+    sh = {"lth": "asc", "htl": "desc"}
     try:
         with open("products_info_price.json") as file:
             products_info = json.load(file)
@@ -231,7 +231,9 @@ def price(id, name, page, sort):
         products += pchome_search(name, pages, pc[sort])
         products += momo_search(name, pages, mo[sort])
         products += shopee_search(name, pages, sh[sort], "price")
-    products = sorted(products, key = lambda d: d["price_avg"]) 
+    products = sorted(products, key = lambda d: d["price_avg"])
+    if sort == "htl":
+        products = products.reverse()
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
     message = ""
