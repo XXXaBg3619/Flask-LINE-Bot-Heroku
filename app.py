@@ -9,11 +9,10 @@ import os
 import psycopg2
 from random import choice
 text_all = [True, False]
-app = Flask(name)
+app = Flask(__name__)
 
-line_bot_api = LineBotApi(os.environ.get(
-    'u0ooJQtQaKfviCcS1fQNH8bcaOxMoGzBDGgEXGu+CAnG0ortULU/B1Ce628MGhm3hNgkngpuD49W/zik8x+JXQAal1+WxK8NtdPAjJvXz01Zj4H0P6NefQVWjdhZQunBIg4E+quJrXan2LI5dDMAKgdB04t89/1O/w1cDnyilFU='))
-handler = WebhookHandler(os.environ.get('496a695efa3e35da186774ccc0a60898'))
+line_bot_api = LineBotApi("S1NRUscHr3pXdpnYh28UZlZmeEnmEbfX6rkSC3WHo/zSbBxUJcKgLEGtOoTlaHB7ntc/QBgAKFcwDuEvM5Kmtwhph1DdYBOeCcVB+N7Cnt9KRyrjdR6vA/+KONhX/VBvK+fqUq6yFpxsahuV3YRPQAdB04t89/1O/w1cDnyilFU=")
+handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 
 
 @app.route("/callback", methods=['POST'])
