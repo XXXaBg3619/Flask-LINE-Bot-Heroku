@@ -26,7 +26,7 @@ def callback():
     return "OK"
 
 
-DATABASE_URL = os.environ['postgres://xseaswlvhvhgnm:a6383e19f7ab5a17b0b89671e2d8c363ce18a229550faaac57d61058e8269929@ec2-34-233-64-238.compute-1.amazonaws.com:5432/de3mlq5i95dhst']
+DATABASE_URL = 'postgres://xseaswlvhvhgnm:a6383e19f7ab5a17b0b89671e2d8c363ce18a229550faaac57d61058e8269929@ec2-34-233-64-238.compute-1.amazonaws.com:5432/de3mlq5i95dhst'
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 cursor = conn.cursor()
