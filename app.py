@@ -260,6 +260,8 @@ def search(id, info, page = 1):
         return price(id, info["search_name"], page, "lth")
     elif info["platform"] == "price2":
         return price(id, info["search_name"], page, "htl")
+    elif info["platform"] == "price":
+        return Help
     else:
         return Except
 
