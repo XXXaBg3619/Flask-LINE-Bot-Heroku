@@ -80,20 +80,16 @@ def pchome(id, name, page):
         with open("products_info_pchome.json") as file:
             products_info = json.load(file)
             try:
-                products = products_info[id]
+                products = products_info[id]["products"]
             except:
                 products = []
-                products_info[id] = products
+                products_info[id]["products"] = products
     except:
         products = []
-        products_info = {id: products}
-    try:
-        print(products["names"], name)
-        if products["names"] != name:
-            products = []
-            products_info = {id: products}
-    except:
-        pass
+        products_info = {id: {"name": name, "products": products}}
+    if products_info[id]["names"] != name:
+        products = []
+        products_info = {id: {"name": name, "products": products}}
     pages = ((page - 1) * limit) // 20 + 1
     if (page == 1 and products == []) or len(products) < page * limit:
         products += pchome_search(name, pages)
