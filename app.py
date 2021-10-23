@@ -88,6 +88,7 @@ def pchome(id, name, page):
         products = []
         products_info = {id: products}
     try:
+        print(products["names"], name)
         if products["names"] != name:
             products = []
             products_info = {id: products}
