@@ -51,12 +51,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -102,12 +103,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -153,12 +155,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -204,12 +207,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -255,12 +259,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -306,12 +311,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -357,12 +363,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -408,12 +415,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -459,12 +467,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
@@ -510,12 +519,13 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "xl",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#1DB446"
+                            "color": "#00ff00",
+                            "size": "32px"
                         },
                         {
                             "type": "text",
