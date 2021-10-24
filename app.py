@@ -62,7 +62,7 @@ def isEmoji(content):
             return True
     return False
 
-def bubble_reload(nameList, priceList, urlList):
+def bubble_reload(nameList, priceList, urlList, platform):
     for i in range(10):
         print(nameList[i])
         print(f"${priceList[i]}")
@@ -82,7 +82,7 @@ def bubble_reload(nameList, priceList, urlList):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -572,26 +572,6 @@ def bubble_reload(nameList, priceList, urlList):
                         }
                     ]
                 }
-            },
-            {
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "sm",
-                    "contents": [
-                        {
-                            "type": "button",
-                            "flex": 1,
-                            "gravity": "center",
-                            "action": {
-                                "type": "postback",
-                                "label": "瀏覽更多",
-                                "data": "瀏覽更多商品"
-                            }
-                        }
-                    ]
-                }
             }
         ]
     }
@@ -803,21 +783,19 @@ def search(id, info, page=1):
         info["platform"] = info["platform"][:6]
     if info["platform"] == "pchome":
         pchome(nameList, priceList, urlList, id, info["search_name"], page)
-        return bubble_reload(nameList, priceList, urlList)
+        return bubble_reload(nameList, priceList, urlList, info["platform"])
     elif info["platform"] == "momo":
         momo(nameList, priceList, urlList, id, info["search_name"], page)
-        return bubble_reload(nameList, priceList, urlList)
+        return bubble_reload(nameList, priceList, urlList, info["platform"])
     elif info["platform"] in ("shopee", "蝦皮"):
         shopee(nameList, priceList, urlList, id, info["search_name"], page)
-        return bubble_reload(nameList, priceList, urlList)
+        return bubble_reload(nameList, priceList, urlList, info["platform"])
     elif info["platform"] == "price1":
-        price(nameList, priceList, urlList, id,
-              info["search_name"], page, "lth")
-        return bubble_reload(nameList, priceList, urlList)
+        price(nameList, priceList, urlList, id, info["search_name"], page, "lth")
+        return bubble_reload(nameList, priceList, urlList, "價錢由低至高")
     elif info["platform"] == "price2":
-        price(nameList, priceList, urlList, id,
-              info["search_name"], page, "htl")
-        return bubble_reload(nameList, priceList, urlList)
+        price(nameList, priceList, urlList, id, info["search_name"], page, "htl")
+        return bubble_reload(nameList, priceList, urlList, "價錢由高至低")
     else:
         return Except
         # """無法搜尋到商品，請確認輸入是否有誤～"""
@@ -852,7 +830,7 @@ def handle_message(event):
                 info[id] = info_id
     except:
         info_id = {}
-        info = {"mode_off": True, id: info_id}
+        info = {"mode_off": False, id: info_id}
     if text == "help":
         message = Help
     elif info["mode_off"] and id != id_developer:
