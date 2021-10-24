@@ -56,8 +56,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -108,8 +108,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -160,8 +160,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -212,8 +212,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -264,8 +264,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -316,8 +316,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -368,8 +368,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -420,8 +420,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -472,8 +472,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
@@ -524,8 +524,8 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                         {
                             "type": "text",
                             "text": platform,
-                            "color": "#00ff00",
-                            "size": "32px"
+                            "color": "#1DB446",
+                            "size": "xl"
                         },
                         {
                             "type": "text",
