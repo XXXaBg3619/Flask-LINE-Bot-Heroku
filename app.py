@@ -17,7 +17,7 @@ handler = WebhookHandler("e104139d44baead65940861cbf50b707")
 id_developer = "U1e38384f12f22c77281ec3e8611025c8"
 
 
-limit = 5    # 每次傳送之商品數上限
+limit = 10    # 每次傳送之商品數上限
 Help = """【搜尋功能】
 若想在 pchome/momo/shopee 搜尋商品
 請先輸入 平台名稱 ，機器人回應後再輸入 產品名稱
@@ -41,18 +41,6 @@ Except = """無法搜尋到商品
 # products_info = {id: products, ...}
 # products = [{"url": url, "name": name, "price": price}, ...]
 
-
-
-def make_tiny(url):
-    request_url = "http://tinyurl.com/api-create.php?" + urlencode({"url": url})
-    with contextlib.closing(urlopen(request_url)) as response:
-        return response.read().decode("utf-8")
-def isEmoji(content):
-    for emoji in UNICODE_EMOJI['en']:
-        if content.count(emoji) > 0:
-            return True
-    return False
-
 def bubble_reload(nameList, priceList, urlList, Platform):
     platform = f"〈{Platform}〉" 
     bubble = {
@@ -63,7 +51,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -85,7 +73,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[0]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -114,7 +102,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -136,7 +124,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[1]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -165,7 +153,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -187,7 +175,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[2]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -216,7 +204,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -238,7 +226,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[3]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -267,7 +255,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -289,7 +277,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[4]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -318,7 +306,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -340,7 +328,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[5]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -369,7 +357,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -391,7 +379,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[6]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -420,7 +408,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -442,7 +430,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[7]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -471,7 +459,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -493,7 +481,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[8]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -522,7 +510,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "md",
+                    "spacing": "xl",
                     "contents": [
                         {
                             "type": "text",
@@ -544,7 +532,7 @@ def bubble_reload(nameList, priceList, urlList, Platform):
                                     "type": "text",
                                     "text": f"${priceList[9]}",
                                     "weight": "bold",
-                                    "size": "xl",
+                                    "size": "md",
                                     "flex": 0
                                 }
                             ]
@@ -587,7 +575,6 @@ def pchome_search(keyword, page, sort='有貨優先'):
 
 
 def pchome(nameList, priceList, urlList, id, name, page):
-    limit = 10
     try:
         with open("products_info_pchome.json") as file:
             products_info = json.load(file)
@@ -635,7 +622,6 @@ def momo_search(name, page, Type=1):
 
 
 def momo(nameList, priceList, urlList, id, name, page):
-    limit = 10
     try:
         with open("products_info_momo.json") as file:
             products_info = json.load(file)
@@ -677,20 +663,7 @@ def shopee_search(name, page, order="desc", by="relevancy"):
         title = item["name"]
         shopid, itemid = item["shopid"], item["itemid"]
         title_fix = title.replace(" ", "-")
-        if isEmoji(title) == True:
-            link = make_tiny(
-                f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
-            tiny = True
-        else:
-            for i in ("[", "<", ":", "：", "【"):
-                if i in title:
-                    link = make_tiny(
-                        f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}")
-                    tiny = True
-                    break
-                tiny = False
-        if not tiny:
-            link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
+        link = f"https://shopee.tw/{title_fix}-i.{shopid}.{itemid}"
         price_min, price_max = int(
             item["price_min"])//100000, int(item["price_max"])//100000
         if price_min == price_max:
@@ -699,14 +672,12 @@ def shopee_search(name, page, order="desc", by="relevancy"):
             price = f"{price_min} ~ {price_max}"
         products.append({"link": link, "name": title, "price": price})
         if by == "price":
-            price_avg = round((price_max+price_min) /
-                              2) if "~" in price else int(price)
+            price_avg = round((price_max+price_min) / 2) if "~" in price else int(price)
             products[-1]["price_avg"] = price_avg
     return products
 
 
 def shopee(nameList, priceList, urlList, id, name, page):
-    limit = 10
     try:
         with open("products_info_shopee.json") as file:
             products_info = json.load(file)
@@ -733,7 +704,6 @@ def shopee(nameList, priceList, urlList, id, name, page):
 
 
 def price(nameList, priceList, urlList, id, name, page, sort):
-    limit = 10
     pc = {"lth": "價錢由低至高", "htl": "價錢由高至低"}
     mo = {"lth": 2, "htl": 3}
     sh = {"lth": "asc", "htl": "desc"}
@@ -759,7 +729,6 @@ def price(nameList, priceList, urlList, id, name, page, sort):
     with open("products_info_price.json", "w") as file:
         json.dump(products_info, file)
     for i in range(limit*(page-1), limit*page):
-        print("i:", i)
         urlList.append(products[i]["link"])
         if "pchome" in products[i]["link"]:
             name = "〈PChome〉" + products[i]["name"]
