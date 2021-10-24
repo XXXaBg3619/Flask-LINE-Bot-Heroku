@@ -20,25 +20,16 @@ id_developer = "U1e38384f12f22c77281ec3e8611025c8"
 limit = 5    # 每次傳送之商品數上限
 Help = """【搜尋功能】
 若想在 pchome/momo/shopee 搜尋商品
-請輸入：  商品名稱;平台 
-(英文請輸入半型)
-Ex:  PS5;pchome 、 滑鼠；MOMO
-要看下一頁則輸入2 3 4 5....
+請先輸入 平台名稱 ，機器人回應後再輸入 產品名稱
+Ex: PChome、PS5、MOMO、switch
+要看第ｎ頁則輸入n
 
 【比價功能】
-請輸入： 商品名稱;price1/price2
-(英文請輸入半型)
+請先輸入 price1/price2 ，機器人回應後再輸入 產品名稱
 price1：價錢由低至高
 price2：價錢由高至低
-Ex:  PS5;price1 、 滑鼠；Price2
-要看下一頁則輸入2 3 4 5....
-
-
-【注意】
-pchome回傳時間<3秒
-momo回傳時間<3秒
-shopee回傳時間<4秒
-price回傳時間<6秒
+Ex:  price1、PS5、Price2、滑鼠
+要看第ｎ頁則輸入n
 
 若是需要查詢使用方式則輸入help即可
 祝泥使用愉快～"""
@@ -62,7 +53,8 @@ def isEmoji(content):
             return True
     return False
 
-def bubble_reload(nameList, priceList, urlList, platform):
+def bubble_reload(nameList, priceList, urlList, Platform):
+    platform = f"〈{Platform}〉" 
     bubble = {
         "type": "carousel",
         "contents": [
@@ -71,7 +63,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -82,7 +74,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[0],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -121,7 +114,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -132,7 +125,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[1],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -171,7 +165,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -182,7 +176,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[2],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -221,7 +216,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -232,7 +227,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[3],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -271,7 +267,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -282,7 +278,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[4],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -321,7 +318,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -332,7 +329,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[5],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -371,7 +369,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -382,7 +380,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[6],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -421,7 +420,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -432,7 +431,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[7],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -471,7 +471,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -482,7 +482,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[8],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -521,7 +522,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                 "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
+                    "spacing": "md",
                     "contents": [
                         {
                             "type": "text",
@@ -532,7 +533,8 @@ def bubble_reload(nameList, priceList, urlList, platform):
                             "type": "text",
                             "text": nameList[9],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "sm",
+                            "wrap": True
                         },
                         {
                             "type": "box",
@@ -772,9 +774,7 @@ def search(id, info, page=1):
     nameList = []
     priceList = []
     urlList = []
-    if len(info["platform"]) >= 6:
-        info["platform"] = info["platform"][:6]
-    if info["platform"] == "pchome":
+    if info["platform"][:6] == "pchome":
         pchome(nameList, priceList, urlList, id, info["search_name"], page)
         return bubble_reload(nameList, priceList, urlList, info["platform"])
     elif info["platform"] == "momo":
@@ -823,7 +823,7 @@ def handle_message(event):
                 info[id] = info_id
     except:
         info_id = {}
-        info = {"mode_off": False, id: info_id}
+        info = {"mode_off": True, id: info_id}
     if text == "help":
         message = Help
     elif info["mode_off"] and id != id_developer:
