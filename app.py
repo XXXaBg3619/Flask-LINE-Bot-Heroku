@@ -845,8 +845,10 @@ def handle_message(event):
         message = search(id, info_id, int(text))
     elif text == "mode off" and id == id_developer:
         info["mode_off"] = True
+        message = "mode off"
     elif text == "mode on" and id == id_developer:
         info["mode_off"] = False
+        message = "mode on"
     else:
         message = Except
     with open("search_info.json", "w") as file:
