@@ -28,8 +28,8 @@ Ex:  PS5;pchome 、 滑鼠；MOMO
 【比價功能】
 請輸入： 商品名稱;price1/price2
 (英文請輸入半型)
-price1：從最低價開始排
-price2：從最高價開始排
+price1：價錢由低至高
+price2：價錢由高至低
 Ex:  PS5;price1 、 滑鼠；Price2
 要看下一頁則輸入2 3 4 5....
 
@@ -63,13 +63,6 @@ def isEmoji(content):
     return False
 
 def bubble_reload(nameList, priceList, urlList, platform):
-    for i in range(10):
-        print(nameList[i])
-        print(f"${priceList[i]}")
-        print(urlList[i])
-    print(len(nameList))
-    print(len(priceList))
-    print(len(urlList))
     bubble = {
         "type": "carousel",
         "contents": [
@@ -132,7 +125,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -182,7 +175,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -232,7 +225,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -282,7 +275,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -332,7 +325,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -382,7 +375,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -432,7 +425,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -482,7 +475,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -532,7 +525,7 @@ def bubble_reload(nameList, priceList, urlList, platform):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "線上比價",
+                            "text": platform,
                             "color": "#1DB446"
                         },
                         {
@@ -853,7 +846,7 @@ def handle_message(event):
         message = Except
     with open("search_info.json", "w") as file:
         json.dump(info, file)
-    if message in (Help, Except):
+    if message in (Help, Except, "mode on", "mode off"):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
     else:
         interface = FlexSendMessage(alt_text='func2', contents = message)
